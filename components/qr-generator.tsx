@@ -53,7 +53,7 @@ export function QrGenerator() {
           rows={5}
           className="mt-3 w-full resize-none rounded-2xl border border-line bg-paper px-4 py-3 text-sm text-ink placeholder:text-muted/60 focus:border-coral focus:outline-none"
         />
-        <div className="mt-7 grid grid-cols-2 gap-5">
+        <div className="mt-7 grid grid-cols-1 gap-5 sm:grid-cols-2">
           <label className="text-sm font-semibold text-ink">
             Size
             <select
@@ -90,13 +90,13 @@ export function QrGenerator() {
           <button
             onClick={downloadQr}
             disabled={!value.trim()}
-            className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-paper transition-opacity hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-paper transition-opacity hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto"
           >
             <Download size={16} /> Download PNG
           </button>
           <button
             onClick={reset}
-            className="inline-flex items-center gap-2 rounded-full border border-line px-5 py-3 text-sm font-semibold text-ink hover:bg-paper"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-line px-5 py-3 text-sm font-semibold text-ink hover:bg-paper sm:w-auto"
           >
             <RotateCcw size={15} /> Reset
           </button>
@@ -105,12 +105,16 @@ export function QrGenerator() {
           <Link2 size={14} /> Your content stays in your browser.
         </p>
       </div>
-      <div className="flex min-h-[420px] items-center justify-center rounded-3xl border border-line bg-sand/60 p-8">
-        <div className="rounded-2xl bg-surface p-5 shadow-lg shadow-ink/5">
+      <div className="flex min-h-[300px] items-center justify-center rounded-3xl border border-line bg-sand/60 p-4 sm:min-h-[420px] sm:p-8">
+        <div className="max-w-full rounded-2xl bg-surface p-3 shadow-lg shadow-ink/5 sm:p-5">
           {value.trim() ? (
-            <canvas ref={canvasRef} aria-label="Generated QR code" />
+            <canvas
+              ref={canvasRef}
+              className="block h-auto max-w-full"
+              aria-label="Generated QR code"
+            />
           ) : (
-            <div className="flex size-64 flex-col items-center justify-center text-center text-muted">
+            <div className="flex aspect-square w-64 max-w-full flex-col items-center justify-center text-center text-muted">
               <QrCode className="mb-3" size={30} strokeWidth={1.5} />
               <p className="text-sm">
                 Enter some text to

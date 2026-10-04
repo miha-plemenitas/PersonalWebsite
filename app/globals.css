@@ -49,6 +49,7 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: "Manrope", sans-serif;
+  overflow-x: hidden;
   transition:
     background-color 300ms ease,
     color 300ms ease;
