@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import QRCode from "qrcode";
-import { Download, Link2, RotateCcw } from "lucide-react";
+import { Download, Link2, QrCode, RotateCcw } from "lucide-react";
 
 const DEFAULT_VALUE = "https://mihaplemenitas.com";
 
@@ -41,7 +41,7 @@ export function QrGenerator() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[.9fr_1.1fr]">
-      <div className="rounded-3xl border border-line bg-white p-6 shadow-card sm:p-8">
+      <div className="rounded-3xl border border-line bg-surface p-6 shadow-card sm:p-8">
         <label htmlFor="qr-content" className="text-sm font-semibold text-ink">
           Text or URL
         </label>
@@ -106,12 +106,12 @@ export function QrGenerator() {
         </p>
       </div>
       <div className="flex min-h-[420px] items-center justify-center rounded-3xl border border-line bg-sand/60 p-8">
-        <div className="rounded-2xl bg-white p-5 shadow-lg shadow-ink/5">
+        <div className="rounded-2xl bg-surface p-5 shadow-lg shadow-ink/5">
           {value.trim() ? (
             <canvas ref={canvasRef} aria-label="Generated QR code" />
           ) : (
             <div className="flex size-64 flex-col items-center justify-center text-center text-muted">
-              <div className="mb-3 text-3xl">⌁</div>
+              <QrCode className="mb-3" size={30} strokeWidth={1.5} />
               <p className="text-sm">
                 Enter some text to
                 <br />

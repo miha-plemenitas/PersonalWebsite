@@ -9,21 +9,28 @@ export const metadata: Metadata = {
 
 export default function ToolBoxPage() {
   return (
-    <section className="site-container py-20 sm:py-28">
-      <div className="max-w-2xl">
-        <p className="font-mono text-xs uppercase tracking-[.2em] text-coral">Useful experiments</p>
-        <h1 className="mt-5 font-display text-5xl font-semibold tracking-[-.05em] sm:text-6xl">
-          ToolBox<span className="text-coral">.</span>
-        </h1>
-        <p className="mt-6 text-lg leading-8 text-muted">
-          Small, focused utilities for building, designing, and making sense of information. Free to
-          use, right in your browser.
+    <section className="page-section">
+      <div className="site-container">
+        <div className="section-heading" data-reveal>
+          <div className="section-kicker">
+            <span>01</span>
+            <span className="section-kicker-line" />
+            <span>ToolBox</span>
+          </div>
+          <h1 className="section-title">
+            Small tools,
+            <br />
+            <span>one clear job.</span>
+          </h1>
+        </div>
+        <p className="page-intro" data-reveal>
+          Browser-based utilities designed to be direct, private, and easy to use.
         </p>
-      </div>
-      <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {toolboxTools.map((tool) => (
-          <ToolCard key={tool.slug} tool={tool} />
-        ))}
+        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {toolboxTools.map((tool) => (
+            <ToolCard key={tool.slug} tool={tool} />
+          ))}
+        </div>
       </div>
     </section>
   );

@@ -1,26 +1,48 @@
 import type { Metadata } from "next";
+import { Check } from "lucide-react";
+
 export const metadata: Metadata = { title: "About" };
+
 export default function AboutPage() {
   return (
-    <section className="site-container max-w-3xl py-20 sm:py-28">
-      <p className="font-mono text-xs uppercase tracking-[.2em] text-coral">How I think</p>
-      <h1 className="mt-5 font-display text-5xl font-semibold tracking-[-.05em]">
-        About me<span className="text-coral">.</span>
-      </h1>
-      <div className="mt-10 space-y-6 text-lg leading-8 text-muted">
-        <p>
-          I&apos;m Miha, a builder with a soft spot for the space where product thinking, data, and
-          interface design meet.
-        </p>
-        <p>
-          I like taking complicated systems and finding the shape that makes them easier to
-          understand — whether that means a dashboard, a workflow, a visual identity, or a small
-          tool that solves one annoying problem.
-        </p>
-        <p>
-          This site is a home for that work, the questions I&apos;m exploring, and the experiments
-          that help me learn by making.
-        </p>
+    <section className="page-section">
+      <div className="site-container">
+        <div className="section-heading" data-reveal>
+          <div className="section-kicker">
+            <span>01</span>
+            <span className="section-kicker-line" />
+            <span>About</span>
+          </div>
+          <h1 className="section-title">
+            Good software
+            <br />
+            <span>should feel simple.</span>
+          </h1>
+        </div>
+        <div className="editorial-grid">
+          <div className="editorial-lead" data-reveal>
+            <p>
+              I care about flow—how a product looks, feels, and moves from one step to the next.
+            </p>
+          </div>
+          <div className="editorial-body" data-reveal>
+            <p>
+              My work sits between software engineering, UI/UX, and design. I like clear structure,
+              useful interfaces, and details that make a product easier to use.
+            </p>
+            <p>
+              I&apos;m also interested in automation: removing repetitive work and helping people
+              spend more time on decisions that matter.
+            </p>
+            <div className="principles">
+              {["Clear flows", "Useful interfaces", "Thoughtful automation"].map((principle) => (
+                <span key={principle}>
+                  <Check size={14} /> {principle}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

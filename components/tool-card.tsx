@@ -8,7 +8,7 @@ export function ToolCard({ tool }: { tool: TinyTool }) {
   const available = tool.status === "available";
 
   return (
-    <div className="group relative flex min-h-64 flex-col justify-between overflow-hidden rounded-3xl border border-line bg-white p-6 shadow-card transition-all hover:-translate-y-1 hover:shadow-lg">
+    <div className="group relative flex min-h-64 flex-col justify-between overflow-hidden rounded-3xl border border-line bg-surface p-6 shadow-card transition-all hover:-translate-y-1 hover:border-coral/40 hover:shadow-lg">
       <div className="flex items-start justify-between">
         <div className="flex size-12 items-center justify-center rounded-2xl bg-sand text-coral">
           <Icon size={23} strokeWidth={1.8} />

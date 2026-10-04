@@ -10,24 +10,32 @@ export const metadata: Metadata = {
 
 export default function QrCodeGeneratorPage() {
   return (
-    <section className="site-container py-16 sm:py-24">
-      <Link
-        href="/toolbox"
-        className="inline-flex items-center gap-2 text-sm font-semibold text-muted hover:text-ink"
-      >
-        <ArrowLeft size={15} /> Back to ToolBox
-      </Link>
-      <div className="mt-10 max-w-2xl">
-        <p className="font-mono text-xs uppercase tracking-[.2em] text-coral">TinyTool / Create</p>
-        <h1 className="mt-5 font-display text-5xl font-semibold tracking-[-.05em] sm:text-6xl">
-          QR code generator<span className="text-coral">.</span>
-        </h1>
-        <p className="mt-6 text-lg leading-8 text-muted">
-          Turn any link or short message into a QR code you can download and share.
+    <section className="page-section">
+      <div className="site-container">
+        <Link href="/toolbox" className="text-action">
+          <ArrowLeft size={15} /> Back to ToolBox
+        </Link>
+        <div className="mt-12">
+          <div className="section-heading" data-reveal>
+            <div className="section-kicker">
+              <span>01</span>
+              <span className="section-kicker-line" />
+              <span>Create</span>
+            </div>
+            <h1 className="section-title">
+              QR code
+              <br />
+              <span>generator.</span>
+            </h1>
+          </div>
+        </div>
+        <p className="page-intro" data-reveal>
+          Convert a URL or short message into a downloadable QR code. Processing stays in your
+          browser.
         </p>
-      </div>
-      <div className="mt-12">
-        <QrGenerator />
+        <div className="mt-12" data-reveal>
+          <QrGenerator />
+        </div>
       </div>
     </section>
   );
