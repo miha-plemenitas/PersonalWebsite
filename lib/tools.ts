@@ -1,4 +1,4 @@
-import { QrCode, Sparkles, Wrench } from "lucide-react";
+import { Gamepad2, QrCode, Sparkles, Wrench } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 export type TinyTool = {
@@ -11,6 +11,14 @@ export type TinyTool = {
 };
 
 export const toolboxTools: TinyTool[] = [
+  {
+    slug: "wend",
+    name: "Daily Wend",
+    description: "Trace connected letters, use every tile, and return for a new puzzle tomorrow.",
+    category: "Play",
+    icon: Gamepad2,
+    status: "available",
+  },
   {
     slug: "qr-code-generator",
     name: "QR code generator",
