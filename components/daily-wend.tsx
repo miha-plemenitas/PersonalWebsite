@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, ChevronDown, RotateCcw, Undo2 } from "lucide-react";
 
 type Puzzle = { id: string; title: string; cells: (string | null)[]; words: string[]; wordPaths: number[][] };
@@ -86,6 +86,7 @@ export function DailyWend() {
   const [isDragging, setIsDragging] = useState(false);
   const [notice, setNotice] = useState("");
   const [openPanel, setOpenPanel] = useState<string | null>("how");
+  const gridRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const current = dailyPuzzle();
@@ -140,6 +141,22 @@ export function DailyWend() {
     if (areAdjacent(last, index)) setPath((current) => [...current, index]);
   }
 
+  function handlePointerDown(event: React.PointerEvent<HTMLDivElement>) {
+    const target = (event.target as HTMLElement).closest<HTMLElement>("[data-cell-index]");
+    const index = target?.dataset.cellIndex;
+    if (index === undefined) return;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    startPath(Number(index));
+  }
+
+  function handlePointerMove(event: React.PointerEvent<HTMLDivElement>) {
+    if (!isDragging || !gridRef.current) return;
+    const target = document.elementFromPoint(event.clientX, event.clientY)?.closest<HTMLElement>("[data-cell-index]");
+    if (!target || !gridRef.current.contains(target)) return;
+    const index = target.dataset.cellIndex;
+    if (index !== undefined) extendPath(Number(index));
+  }
+
   function finishPath() {
     if (!isDragging) return;
     if (!puzzle) return;
@@ -191,14 +208,14 @@ export function DailyWend() {
       </div>
       <div className="wend-board-card">
         <p className="wend-instruction">Drag horizontally or vertically. No diagonals. Use every tile once.</p>
-        <div className="wend-grid" onPointerUp={finishPath} onPointerCancel={finishPath} onPointerLeave={() => isDragging && setIsDragging(false)}>
+        <div ref={gridRef} className="wend-grid" onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={finishPath} onPointerCancel={finishPath}>
           {letters.map((letter, index) => {
             if (letter === null) return <div className="wend-obstacle" key={`${puzzle.id}-obstacle-${index}`} aria-hidden="true" />;
             const selected = path.includes(index);
             const used = usedCells.has(index);
             const wordIndex = cellWordIndex.get(index);
             const previewIndex = path.length > 0 ? path[0] % 6 : 0;
-            return <button type="button" className={`wend-cell ${selected ? "is-selected" : ""} ${used ? "is-used" : ""} ${wordIndex !== undefined ? `wend-word-${wordIndex}` : ""} ${selected ? `wend-preview-${previewIndex}` : ""}`} key={`${puzzle.id}-${index}`} onPointerDown={() => startPath(index)} onPointerEnter={() => extendPath(index)} aria-label={`Letter ${letter}, row ${Math.floor(index / COLS) + 1}, column ${(index % COLS) + 1}`}><span>{letter}</span>{selected && <i>{path.indexOf(index) + 1}</i>}</button>;
+            return <button type="button" data-cell-index={index} className={`wend-cell ${selected ? "is-selected" : ""} ${used ? "is-used" : ""} ${wordIndex !== undefined ? `wend-word-${wordIndex}` : ""} ${selected ? `wend-preview-${previewIndex}` : ""}`} key={`${puzzle.id}-${index}`} aria-label={`Letter ${letter}, row ${Math.floor(index / COLS) + 1}, column ${(index % COLS) + 1}`}><span>{letter}</span>{selected && <i>{path.indexOf(index) + 1}</i>}</button>;
           })}
         </div>
         <div className="wend-answers" aria-label="Words to find">
