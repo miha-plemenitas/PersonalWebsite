@@ -117,11 +117,16 @@ The shared card shadow is intentionally light:
 
 Use elevation to support interaction and grouping. Do not make every surface float.
 
+### Page background gradient
+
+The page canvas uses two visible but soft radial color washes. In light mode, use `#a61c46` and black over `paper`; in dark mode, use `#a61c46` and white. Keep the washes broad and feathered so they add depth without reducing text contrast. Avoid gradients inside every component.
+
 ## Components
 
 ### Header
 
-- Paper background with slight transparency and backdrop blur
+- Fixed at the top of the viewport so page content scrolls beneath it
+- Transparent over the page gradient at the top; gains a paper surface, divider, and backdrop blur after scrolling
 - Bottom divider using `line`
 - Wordmark is `Miha.` with a cherry-red full stop
 - `About` and `Work` are muted text links
@@ -174,6 +179,7 @@ The current visual language is intentionally lightweight and does not depend on 
 - Hero block animation: colored blocks first assemble into an abstract structure, then spell `M I H A` one letter at a time in a slow loop
 - Block animation pauses in its completed state when `prefers-reduced-motion: reduce` is enabled
 - Minimal iconography from Lucide
+- A fine, static grain overlay sits above the page gradient to add texture; keep it visible but subtle enough that text and controls remain crisp
 
 New imagery should feel tactile, warm, and editorial. Prefer abstract geometry, data-like patterns, and purposeful motion over generic stock imagery, glossy gradients, noisy backgrounds, and ornamental effects that compete with the content.
 
