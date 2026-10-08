@@ -27,20 +27,4 @@ export const toolboxTools: TinyTool[] = [
     icon: QrCode,
     status: "available",
   },
-  {
-    slug: "color-palette",
-    name: "Color palette",
-    description: "A quick way to collect and share a handful of colors.",
-    category: "Design",
-    icon: Sparkles,
-    status: "coming-soon",
-  },
-  {
-    slug: "more-tools",
-    name: "More tools",
-    description: "Small, focused utilities for everyday creative work.",
-    category: "Explore",
-    icon: Wrench,
-    status: "coming-soon",
-  },
 ];

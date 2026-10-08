@@ -26,7 +26,7 @@
 }
 
 :root {
-  --glow-red: color-mix(in srgb, #a61c46 31%, transparent);
+  --glow-red: color-mix(in srgb, #000000 14%, transparent);
   --glow-contrast: color-mix(in srgb, #000000 13%, transparent);
 }
 
@@ -59,7 +59,7 @@ html {
 body {
   background-color: var(--paper);
   background-image:
-    radial-gradient(ellipse 78% 58% at 10% 4%, var(--glow-red), transparent 72%),
+    radial-gradient(ellipse 68% 52% at 6% 2%, var(--glow-red), transparent 70%),
     radial-gradient(ellipse 78% 62% at 94% 72%, var(--glow-contrast), transparent 74%);
   color: var(--ink);
   font-family: "Manrope", sans-serif;
