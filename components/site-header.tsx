@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { BrandLogo } from "@/components/brand-logo";
 
 export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -24,10 +25,11 @@ export function SiteHeader() {
       <div className="site-container flex h-20 items-center justify-between">
         <Link
           href="/"
-          className="font-display text-base font-bold uppercase tracking-[.12em] text-ink"
+          className="site-brand"
           onClick={() => setMenuOpen(false)}
         >
-          Miha Plemenitaš<span className="text-coral">.</span>
+          <BrandLogo size="small" />
+          <span>Miha Plemenitaš<span className="text-coral">.</span></span>
         </Link>
         <nav aria-label="Main navigation" className={`site-nav ${menuOpen ? "site-nav-open" : ""}`}>
           <Link className="nav-item" href="/about" onClick={() => setMenuOpen(false)}>

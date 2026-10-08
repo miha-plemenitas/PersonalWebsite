@@ -2,12 +2,15 @@
 
 import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
+import blackSmall from "@/components/icons/Website logo — Small — 120 × 80@2x.png";
+import whiteSmall from "@/components/icons/Website logo — White — Small — 120 × 81@2x.png";
 
 type Theme = "light" | "dark";
 
 export function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>("light");
   const [ready, setReady] = useState(false);
+  const isDark = theme === "dark";
 
   useEffect(() => {
     const stored = window.localStorage.getItem("theme");
@@ -25,9 +28,10 @@ export function ThemeToggle() {
     if (!ready) return;
     document.documentElement.dataset.theme = theme;
     window.localStorage.setItem("theme", theme);
-  }, [ready, theme]);
-
-  const isDark = theme === "dark";
+    document.querySelectorAll<HTMLLinkElement>('link[rel~="icon"]').forEach((icon) => {
+      icon.href = isDark ? whiteSmall.src : blackSmall.src;
+    });
+  }, [isDark, ready, theme]);
 
   return (
     <button
