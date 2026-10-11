@@ -2,26 +2,43 @@
 
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { BrandLogo } from "@/components/brand-logo";
 
 export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const lastScrollY = useRef(0);
 
   useEffect(() => {
     function updateScrolled() {
-      setScrolled(window.scrollY > 20);
+      const currentScrollY = window.scrollY;
+      setScrolled(currentScrollY > 20);
+
+      const scrollDelta = currentScrollY - lastScrollY.current;
+
+      if (menuOpen || currentScrollY < 40) {
+        setHidden(false);
+        lastScrollY.current = currentScrollY;
+      } else if (scrollDelta > 8) {
+        setHidden(true);
+        lastScrollY.current = currentScrollY;
+      } else if (scrollDelta < -8) {
+        setHidden(false);
+        lastScrollY.current = currentScrollY;
+      }
     }
 
+    lastScrollY.current = window.scrollY;
     updateScrolled();
     window.addEventListener("scroll", updateScrolled, { passive: true });
     return () => window.removeEventListener("scroll", updateScrolled);
-  }, []);
+  }, [menuOpen]);
 
   return (
-    <header className={`site-header ${scrolled ? "is-scrolled" : ""}`}>
+    <header className={`site-header ${scrolled ? "is-scrolled" : ""} ${hidden ? "is-hidden" : ""}`}>
       <div className="site-container flex h-20 items-center justify-between">
         <Link
           href="/"

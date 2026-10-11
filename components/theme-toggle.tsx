@@ -6,39 +6,61 @@ import blackSmall from "@/components/icons/Website logo — Small — 120 × 80@
 import whiteSmall from "@/components/icons/Website logo — White — Small — 120 × 81@2x.png";
 
 type Theme = "light" | "dark";
+const THEME_SETTING_KEY = "theme";
 
 export function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>("light");
-  const [ready, setReady] = useState(false);
-  const isDark = theme === "dark";
 
   useEffect(() => {
-    const stored = window.localStorage.getItem("theme");
-    const initial: Theme =
-      stored === "light" || stored === "dark"
-        ? stored
-        : window.matchMedia("(prefers-color-scheme: dark)").matches
-          ? "dark"
-          : "light";
-    setTheme(initial);
-    setReady(true);
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const savedSetting = window.localStorage.getItem("theme-setting");
+    const savedTheme = window.localStorage.getItem(THEME_SETTING_KEY);
+    const storedTheme = savedSetting === "light" || savedSetting === "dark"
+      ? savedSetting
+      : savedTheme === "light" || savedTheme === "dark"
+        ? savedTheme
+        : null;
+    if (storedTheme === null) window.localStorage.removeItem("theme-setting");
+
+    function applyTheme(nextTheme: Theme, followsSystem = false) {
+      setTheme(nextTheme);
+      if (followsSystem) {
+        document.documentElement.removeAttribute("data-theme");
+      } else {
+        document.documentElement.dataset.theme = nextTheme;
+      }
+      document.querySelectorAll<HTMLLinkElement>('link[rel~="icon"]').forEach((icon) => {
+        icon.href = nextTheme === "dark" ? whiteSmall.src : blackSmall.src;
+      });
+    }
+
+    applyTheme(storedTheme ?? (media.matches ? "dark" : "light"), storedTheme === null);
+    function handleSystemChange(event: MediaQueryListEvent) {
+      if (!window.localStorage.getItem("theme-setting") && !window.localStorage.getItem(THEME_SETTING_KEY)) {
+        applyTheme(event.matches ? "dark" : "light", true);
+      }
+    }
+    media.addEventListener("change", handleSystemChange);
+    return () => media.removeEventListener("change", handleSystemChange);
   }, []);
 
-  useEffect(() => {
-    if (!ready) return;
-    document.documentElement.dataset.theme = theme;
-    window.localStorage.setItem("theme", theme);
+  function toggleTheme() {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    setTheme(nextTheme);
+    document.documentElement.dataset.theme = nextTheme;
+    window.localStorage.setItem(THEME_SETTING_KEY, nextTheme);
+    window.localStorage.removeItem("theme-setting");
     document.querySelectorAll<HTMLLinkElement>('link[rel~="icon"]').forEach((icon) => {
-      icon.href = isDark ? whiteSmall.src : blackSmall.src;
+      icon.href = nextTheme === "dark" ? whiteSmall.src : blackSmall.src;
     });
-  }, [isDark, ready, theme]);
+  }
 
   return (
     <button
       type="button"
       className="theme-toggle"
-      onClick={() => setTheme(isDark ? "light" : "dark")}
-      aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
+      onClick={toggleTheme}
+      aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
     >
       <span className="theme-toggle-track" aria-hidden="true">
         <Sun size={13} />

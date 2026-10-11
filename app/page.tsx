@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight, Mail, MapPin } from "lucide-react";
+import { ArrowDown, ArrowRight, ArrowUpRight, Mail, MapPin } from "lucide-react";
 import { BuildingBlocks } from "@/components/building-blocks";
 import { projects, skillGroups } from "@/lib/resume";
 
@@ -70,44 +70,35 @@ export default function Home() {
   return (
     <>
       <section className="hero-section">
-        <div className="site-container grid items-center gap-14 lg:grid-cols-[1.12fr_.88fr] lg:gap-20">
+        <div className="site-container">
           <div className="hero-copy">
             <div className="availability" data-reveal>
               <span className="availability-dot" />
-              Software engineer · Murska Sobota, Slovenia
+              01 / Software engineer · Slovenia
             </div>
             <h1 className="hero-title" data-reveal>
               “Life is short,
               <br />
-              but the craft is long.”<span>.</span>
+              but the craft is long<span>.</span>”
             </h1>
-            <p className="hero-quote-credit" data-reveal>
-              — Hippocrates
-            </p>
+            <p className="hero-quote-credit" data-reveal>— Hippocrates</p>
             <p className="hero-intro" data-reveal>
-              I&apos;m Miha. I design and build software with a focus on flow, clear UI/UX, and
-              useful automation.
+              I&apos;m Miha, a software engineer interested in thoughtful interfaces, reliable systems,
+              and the small details that make software feel clear.
             </p>
             <div className="hero-actions" data-reveal>
               <a className="primary-action" href="#selected-work">
-                Selected work <ArrowRight size={16} />
+                Explore selected work <ArrowDown className="action-down-arrow" size={16} />
               </a>
               <a className="text-action" href="mailto:miha.plemenitas@gmail.com">
                 <Mail size={15} /> Get in touch
               </a>
             </div>
           </div>
-          <div className="hero-visual" data-reveal>
+          <div className="hero-visual" data-reveal aria-hidden="true">
             <BuildingBlocks />
-            <div className="hero-note hero-note-top">
-              <span>Current focus</span>
-              <strong>Telemetry systems</strong>
-            </div>
-            <div className="hero-note hero-note-bottom">
-              <MapPin size={13} />
-              <span>46.6625° N · 16.1664° E</span>
-            </div>
           </div>
+          <div className="hero-location"><MapPin size={13} /> Murska Sobota, SI <span>·</span> 46.6625° N / 16.1664° E</div>
         </div>
       </section>
       <div className="marquee" aria-label="Technical disciplines">
@@ -150,9 +141,20 @@ export default function Home() {
             title="Systems built for"
             muted="real use."
           />
+          <nav className="project-index-nav" aria-label="Jump to a project">
+            {projects.map((project, index) => (
+              <a href={`#project-${index + 1}`} key={project.name}>
+                <span>0{index + 1}</span>
+                {project.name}
+                <ArrowUpRight size={13} />
+              </a>
+            ))}
+          </nav>
           <div className="project-list">
             {projects.map((project, index) => (
-              <ProjectRow key={project.name} project={project} index={index} />
+              <div id={`project-${index + 1}`} key={project.name} className="project-anchor">
+                <ProjectRow project={project} index={index} />
+              </div>
             ))}
           </div>
           <div className="mt-10 flex justify-end" data-reveal>

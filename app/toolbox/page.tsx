@@ -13,7 +13,7 @@ export default function ToolBoxPage() {
       <div className="site-container">
         <div className="section-heading" data-reveal>
           <div className="section-kicker">
-            <span>01</span>
+            <span>04</span>
             <span className="section-kicker-line" />
             <span>ToolBox</span>
           </div>

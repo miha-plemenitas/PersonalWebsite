@@ -40,7 +40,7 @@ export function QrGenerator() {
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[.9fr_1.1fr]">
+    <div className="qr-generator grid gap-8 lg:grid-cols-[.9fr_1.1fr]">
       <div className="rounded-3xl border border-line bg-surface p-6 shadow-card sm:p-8">
         <label htmlFor="qr-content" className="text-sm font-semibold text-ink">
           Text or URL

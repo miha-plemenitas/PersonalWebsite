@@ -32,13 +32,14 @@ export function ToolCard({ tool }: { tool: TinyTool }) {
   );
 
   if (!available) {
-    return <div className="group relative flex min-h-64 flex-col justify-between overflow-hidden rounded-3xl border border-line bg-surface p-6 shadow-card">{cardContent}</div>;
+    return <div data-reveal className="group relative flex min-h-64 flex-col justify-between overflow-hidden rounded-3xl border border-line bg-surface p-6 shadow-card">{cardContent}</div>;
   }
 
   return (
     <Link
-      className="group relative flex min-h-64 flex-col justify-between overflow-hidden rounded-3xl border border-line bg-surface p-6 shadow-card transition-all hover:-translate-y-1 hover:border-coral/40 hover:shadow-lg focus-visible:-translate-y-1"
+      className="group relative flex min-h-64 flex-col justify-between overflow-hidden rounded-3xl border border-line bg-surface p-6 shadow-card transition-colors hover:border-coral focus-visible:border-coral"
       href={`/toolbox/${tool.slug}` as Route}
+      data-reveal
     >
       {cardContent}
     </Link>

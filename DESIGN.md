@@ -1,207 +1,44 @@
-# Design DNA
+# Design system
 
-This document describes the current visual language of the personal website and ToolBox. It is a practical reference for extending the site without losing its character.
+The portfolio uses a restrained editorial style with cues from product directories: oversized typography, numbered labels, compact indexes, thin rules, and content arranged in clear rows. The ArtCraft Crafting Apps page is an inspiration for this structure, adapted to Miha’s portfolio and visual identity.
 
-## Design idea
+## Visual direction
 
-The site is warm, editorial, and quietly playful. It combines a calm paper-like canvas with dark ink typography, a single cherry-red accent, generous whitespace, and small moments of motion. The homepage is intentionally simple: one clear statement about making useful things, paired with a visual metaphor of blocks assembling into something practical.
+- **Palette:** warm paper `#f7f6f2`, deep ink `#1d211d`, and burgundy `#a61b45`. Dark mode uses near-black surfaces and warm white text. Keep burgundy as the main accent in both themes.
+- **Typography:** Manrope for display and body text; DM Mono for metadata, section numbers, and technical labels.
+- **Shape language:** square corners, thin borders, straight dividers, crisp grid cells, and minimal shadows. Avoid pill shapes and ornamental rounding in new components.
+- **Layout:** centered content capped at 1120px, generous vertical spacing, clear two-column desktop compositions, and responsive layouts that simplify on mobile.
+- **Texture:** no page-wide gradient or background grid. The animated building-block illustration may use its own square grid as a contained visual.
+- **Emphasis:** use burgundy for key words, section markers, links, selected states, and primary actions. Keep surrounding surfaces monochrome.
 
-Core principles:
+## Theme and navigation
 
-- Make useful things feel approachable.
-- Use whitespace and hierarchy instead of decoration to create clarity.
-- Keep controls obvious, tactile, and accessible.
-- Let cherry red mark action, energy, and moments worth noticing.
-- Keep ToolBox focused: one tool, one clear job.
+- Follow the device’s light or dark preference by default on desktop and mobile.
+- The header toggle switches directly between light and dark and remembers the visitor’s explicit choice.
+- The fixed header gains a solid, lightly blurred surface after scrolling and hides while scrolling down; scrolling up reveals it.
+- Desktop navigation stays compact and uppercase. Mobile navigation opens as a full-width, square-edged panel with ruled links.
+- Keep the theme control and mobile menu aligned in the header and usable by keyboard and touch.
 
-## Typography
+## Motion
 
-### Primary typeface — Manrope
+- Use short, restrained transitions to clarify state: staggered content reveals, slight link and card responses, arrow movement, and crisp tile feedback.
+- The hero illustration assembles square blocks with a snap-like motion. Puzzle answers use a short rectangular reveal; tile selection and success states use clear color and outline changes.
+- Avoid bounce, elastic movement, decorative rotation, large floating effects, and excessive blur.
+- Respect `prefers-reduced-motion`: remove nonessential animation and transitions and show reveal content immediately.
 
-Manrope is used for body copy, navigation, labels, buttons, headings, and display text.
+## Page patterns
 
-- Source: Google Fonts
-- Weights loaded: 400, 500, 600, 700, 800
-- Character: contemporary, friendly, geometric, and highly legible
-- Body: regular weight with relaxed line-height
-- Headings: 600–800 weight with tight tracking
+- **Home:** the first screen features the full quote “Life is short, but the craft is long.” credited to Hippocrates, a concise introduction, clear calls to action, and the contained block illustration.
+- **About, Work, and ToolBox:** reuse numbered editorial headings, consistent page rhythm, compact indexes, and thin dividers.
+- **Projects:** present role, dates, description, technologies, and navigation in structured rows or square-edged case cards.
+- **Résumé:** use a timeline for education and experience, with a compact skills grid.
+- **ToolBox:** keep games and utilities consistent with the black, white, and burgundy palette. Use square tiles, buttons, controls, and feedback states.
+- **Footer:** keep contact links, brand mark, and location details concise and easy to scan.
 
-Current usage:
+## Accessibility and content
 
-- Display/headings: `font-display`, typically `font-semibold`, `tracking-[-.05em]`
-- Body/navigation: `font-sans` or the base Manrope style
-- Small labels: 500–600 weight
-
-### Utility typeface — DM Mono
-
-DM Mono is reserved for metadata and system-like labels:
-
-- ToolBox category eyebrow text
-- Section numbering
-- Uppercase labels such as `Designer · Developer · Builder`
-- Letter spacing: usually `tracking-[.15em]` to `tracking-[.2em]`
-- Size: typically `text-xs`
-
-Use it sparingly. It should add a technical/product feel without making the site feel like a terminal.
-
-## Color palette
-
-The palette is defined as CSS variables in `app/globals.css` and exposed as Tailwind colors.
-
-| Token   | Hex       | Role                                                         |
-| ------- | --------- | ------------------------------------------------------------ |
-| `paper` | `#f7f6f2` | Main page canvas and soft input background                   |
-| `ink`   | `#1d211d` | Primary text, dark buttons, high-contrast UI                 |
-| `muted` | `#6c716b` | Supporting text, descriptions, secondary navigation          |
-| `line`  | `#dedfd8` | Borders, dividers, and understated structure                 |
-| `coral` | `#a61b45` | Cherry-red accent, links, active energy, icons, eyebrow text |
-| `sand`  | `#f1e9dd` | Warm secondary surface, icon backgrounds, QR preview area    |
-| white   | `#ffffff` | Cards, panels, QR canvas container                           |
-
-Color guidance:
-
-- Use `paper` as the default background.
-- Use `ink` for important text and primary actions.
-- Use `muted` for supporting copy, never for essential information on its own.
-- Use `coral` as a deliberate cherry-red accent, not as a large page background.
-- Pair `coral` with `paper`, `sand`, or `white`; use `ink` when strong contrast is required.
-- QR foreground and background colors must remain sufficiently contrasting for scanability.
-
-## Layout and spacing
-
-The layout is spacious and responsive, with a centered content column.
-
-- Main content max width: `1120px`
-- Horizontal gutter: `2.5rem` below 640px; `4rem` from 640px upward
-- Header height: `80px`
-- Large page sections: usually `py-20` to `py-28`
-- Hero minimum height: approximately `620px`
-- Common content gaps: `gap-5`, `gap-8`, `gap-14`
-- Main body line-height: approximately `1.75` for comfortable reading
-
-Responsive behavior:
-
-- Mobile-first layouts stack content vertically.
-- Navigation remains compact and keeps ToolBox as the strongest action.
-- Cards move from one column to two and then three columns as space allows.
-- The QR generator switches from a two-column workspace to a stacked layout below the large breakpoint.
-
-## Shape language
-
-The site uses rounded forms with a friendly, tactile quality:
-
-- Full pill shape for primary navigation/actions and status-like controls
-- `rounded-3xl` for cards, panels, hero surfaces, and major tool areas
-- `rounded-2xl` for icon blocks, inputs, and QR containers
-- `rounded-xl` for compact selects and color controls
-- Borders are subtle and use `line`
-
-Avoid sharp rectangular cards unless a future component has a strong functional reason.
-
-## Surfaces and elevation
-
-The visual hierarchy comes from surface changes more than heavy shadows:
-
-- Page: `paper`
-- Secondary section: translucent white over `paper`
-- Cards and form panels: white with a `line` border
-- Accent surface: `sand`
-- QR preview stage: translucent `sand`
-
-The shared card shadow is intentionally light:
-
-```css
-0 2px 0 rgba(29, 33, 29, 0.02),
-0 12px 32px rgba(29, 33, 29, 0.05)
-```
-
-Use elevation to support interaction and grouping. Do not make every surface float.
-
-### Page background gradient
-
-The page canvas uses two visible but soft radial color washes. In light mode, use `#a61c46` and black over `paper`; in dark mode, use `#a61c46` and white. Keep the washes broad and feathered so they add depth without reducing text contrast. Avoid gradients inside every component.
-
-## Components
-
-### Header
-
-- Fixed at the top of the viewport so page content scrolls beneath it
-- Transparent over the page gradient at the top; gains a paper surface, divider, and backdrop blur after scrolling
-- Bottom divider using `line`
-- Wordmark is `Miha.` with a cherry-red full stop
-- `About` and `Work` are muted text links
-- `ToolBox` is the dark pill-shaped primary navigation action
-
-### Buttons and links
-
-- Primary button: dark ink background, paper text, pill shape
-- Secondary action: bordered pill or text link
-- Action links use cherry red when they represent an available tool or forward movement
-- Icons are from `lucide-react`, generally 15–16px inside controls
-- Hover motion is subtle: slight upward translation or icon movement
-
-### Tool cards
-
-- White, bordered, `rounded-3xl` surface
-- Minimum height: `16rem`
-- Icon block: `3rem` square, sand background, coral icon
-- Category appears as a small paper pill
-- Available tools expose a coral “Try it” link
-- Future tools use muted “Coming soon” text
-- Hover: lift by roughly `4px` and increase shadow slightly
-
-### QR generator
-
-The QR page is split into two clear zones:
-
-1. White control panel containing input, size, colors, actions, and privacy note.
-2. Sand preview stage containing the generated QR code on a white elevated canvas.
-
-The interface should remain calm even as more controls are added. Group advanced options rather than adding visual noise beside the primary input.
-
-## Interaction and accessibility
-
-Interaction should feel responsive but restrained:
-
-- Use short color/transform transitions.
-- Keep focus visible with a 3px cherry-red-tinted outline and 3px offset.
-- Every form control needs a visible or accessible label.
-- Disabled actions use reduced opacity and a not-allowed cursor.
-- Do not rely on color alone to communicate availability or state.
-- Keep touch targets comfortably sized, especially on the QR generator.
-- Respect reduced-motion preferences if more animation is introduced.
-
-## Imagery and decoration
-
-The current visual language is intentionally lightweight and does not depend on photography. Decoration is made from simple geometry and a code-native animated nebula:
-
-- Hero dot grid: 18px spacing with small muted dots
-- Hero block animation: colored blocks first assemble into an abstract structure, then spell `M I H A` one letter at a time in a slow loop
-- Block animation pauses in its completed state when `prefers-reduced-motion: reduce` is enabled
-- Minimal iconography from Lucide
-- A fine, static grain overlay sits above the page gradient to add texture; keep it visible but subtle enough that text and controls remain crisp
-
-New imagery should feel tactile, warm, and editorial. Prefer abstract geometry, data-like patterns, and purposeful motion over generic stock imagery, glossy gradients, noisy backgrounds, and ornamental effects that compete with the content.
-
-## Content voice
-
-Copy is concise, direct, and human:
-
-- Prefer plain language over product jargon.
-- Explain what a tool does in one sentence.
-- Use short, confident headings.
-- Keep the tone curious and quietly optimistic.
-- ToolBox should sound helpful, not gimmicky.
-
-## Implementation reference
-
-Design tokens and global behavior live in:
-
-- `app/globals.css`
-- `components/site-header.tsx`
-- `components/site-footer.tsx`
-- `components/tool-card.tsx`
-- `components/qr-generator.tsx`
-- `components/building-blocks.tsx`
-
-When adding a new component, use the existing tokens (`paper`, `ink`, `muted`, `line`, `coral`, `sand`) before introducing a new color or shadow. The `coral` token is retained as a semantic name for the site’s cherry-red accent.
+- Keep visible focus indicators and keyboard navigation usable.
+- Give every form control a visible or accessible label.
+- Pair color with text, shape, or position when communicating status.
+- Preserve readable contrast in both themes, including generated QR codes.
+- Keep descriptions concise and direct, and make interactive targets comfortable on touch screens.

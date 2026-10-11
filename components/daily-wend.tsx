@@ -214,8 +214,7 @@ export function DailyWend() {
             const selected = path.includes(index);
             const used = usedCells.has(index);
             const wordIndex = cellWordIndex.get(index);
-            const previewIndex = path.length > 0 ? path[0] % 6 : 0;
-            return <button type="button" data-cell-index={index} className={`wend-cell ${selected ? "is-selected" : ""} ${used ? "is-used" : ""} ${wordIndex !== undefined ? `wend-word-${wordIndex}` : ""} ${selected ? `wend-preview-${previewIndex}` : ""}`} key={`${puzzle.id}-${index}`} aria-label={`Letter ${letter}, row ${Math.floor(index / COLS) + 1}, column ${(index % COLS) + 1}`}><span>{letter}</span>{selected && <i>{path.indexOf(index) + 1}</i>}</button>;
+            return <button type="button" data-cell-index={index} className={`wend-cell ${selected ? "is-selected" : ""} ${used ? "is-used" : ""} ${wordIndex !== undefined ? `wend-word-${wordIndex}` : ""}`} key={`${puzzle.id}-${index}`} aria-label={`Letter ${letter}, row ${Math.floor(index / COLS) + 1}, column ${(index % COLS) + 1}`}><span>{letter}</span>{selected && <i>{path.indexOf(index) + 1}</i>}</button>;
           })}
         </div>
         <div className="wend-answers" aria-label="Words to find">

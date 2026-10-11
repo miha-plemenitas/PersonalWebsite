@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { GitFork } from "lucide-react";
+import { ArrowUpRight, GitFork } from "lucide-react";
 import { projects } from "@/lib/resume";
 
 export const metadata: Metadata = { title: "Work" };
@@ -10,7 +10,7 @@ export default function WorkPage() {
       <div className="site-container">
         <div className="section-heading" data-reveal>
           <div className="section-kicker">
-            <span>01</span>
+            <span>03</span>
             <span className="section-kicker-line" />
             <span>Work</span>
           </div>
@@ -20,9 +20,18 @@ export default function WorkPage() {
             <span>engineering projects.</span>
           </h1>
         </div>
+        <nav className="project-index-nav work-index" aria-label="Jump to a project">
+          {projects.map((project, index) => (
+            <a href={`#work-${index + 1}`} key={project.name}>
+              <span>0{index + 1}</span>
+              {project.name}
+              <ArrowUpRight size={13} />
+            </a>
+          ))}
+        </nav>
         <div className="space-y-6">
           {projects.map((project, index) => (
-            <article className="case-card" data-reveal key={project.name}>
+            <article className="case-card" data-reveal key={project.name} id={`work-${index + 1}`}>
               <div className="case-card-top">
                 <span className="project-index">0{index + 1}</span>
                 <span className="project-meta">{project.period}</span>
