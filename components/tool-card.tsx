@@ -38,7 +38,7 @@ export function ToolCard({ tool }: { tool: TinyTool }) {
   return (
     <Link
       className="group relative flex min-h-64 flex-col justify-between overflow-hidden rounded-3xl border border-line bg-surface p-6 shadow-card transition-colors hover:border-coral focus-visible:border-coral"
-      href={`/toolbox/${tool.slug}` as Route}
+      href={(tool.slug === "stamp" ? "/stamp" : `/toolbox/${tool.slug}`) as Route}
       data-reveal
     >
       {cardContent}

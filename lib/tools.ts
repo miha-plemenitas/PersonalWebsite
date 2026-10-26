@@ -1,4 +1,4 @@
-import { Gamepad2, QrCode, Sparkles, Wrench } from "lucide-react";
+import { Clock3, Gamepad2, QrCode, Sparkles, Wrench } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 export type TinyTool = {
@@ -11,6 +11,14 @@ export type TinyTool = {
 };
 
 export const toolboxTools: TinyTool[] = [
+  {
+    slug: "stamp",
+    name: "Stamp",
+    description: "Find your work-hours sheet and keep your workday in one place.",
+    category: "Track",
+    icon: Clock3,
+    status: "available",
+  },
   {
     slug: "wend",
     name: "Daily Wend",
