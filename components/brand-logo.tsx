@@ -1,10 +1,10 @@
 import Image, { type StaticImageData } from "next/image";
-import blackLarge from "@/components/icons/Website logo — Large — 360 × 240@2x.png";
-import blackMedium from "@/components/icons/Website logo — Medium — 240 × 160@2x.png";
-import blackSmall from "@/components/icons/Website logo — Small — 120 × 80@2x.png";
-import whiteLarge from "@/components/icons/Website logo — White — Large — 360 × 241@2x.png";
-import whiteMedium from "@/components/icons/Website logo — White — Medium — 240 × 161@2x.png";
-import whiteSmall from "@/components/icons/Website logo — White — Small — 120 × 81@2x.png";
+import blackLarge from "@/components/icons/personal/Website logo — Large — 360 × 240@2x.png";
+import blackMedium from "@/components/icons/personal/Website logo — Medium — 240 × 160@2x.png";
+import blackSmall from "@/components/icons/personal/Website logo — Small — 120 × 80@2x.png";
+import whiteLarge from "@/components/icons/personal/Website logo — White — Large — 360 × 240@2x.png";
+import whiteMedium from "@/components/icons/personal/Website logo — White — Medium — 240 × 160@2x.png";
+import whiteSmall from "@/components/icons/personal/Website logo — White — Small — 120 × 80@2x.png";
 
 type LogoSize = "small" | "medium" | "large";
 

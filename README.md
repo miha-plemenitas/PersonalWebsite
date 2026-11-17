@@ -29,3 +29,5 @@ Stamp is available at `/stamp`. It requires a Google OAuth web client ID, the Go
 4. Copy `.env.example` to `.env.local` and set `NEXT_PUBLIC_GOOGLE_CLIENT_ID` to the OAuth client ID.
 
 Stamp requests Google account identity, read-only Drive metadata access to find `Triglav_Delovne_Ure`, and Google Sheets access to read and update that timecard. It records arrivals in column C, departures in column D, decimal daily hours in column E, and the month-end total in column F on the final day of the month. At month-end, it colors that row cherry red with white text. Google's Sheets scope is account-wide; Stamp's code only writes to the matching timecard file.
+
+Stamp can be installed from a supported browser. On iPhone or iPad, open `/stamp` in Safari, tap **Share → Add to Home Screen**, enable **Open as Web App** if offered, and tap **Add**. After a successful online visit to the production app, its service worker can show a standalone offline page. Google sign-in and timecard reads and writes require a network connection.

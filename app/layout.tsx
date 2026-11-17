@@ -3,7 +3,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { RouteEffects } from "@/components/route-effects";
 import { ScrollProgress } from "@/components/scroll-progress";
-import logoIcon from "@/components/icons/Website logo — Small — 120 × 80@2x.png";
+import logoIcon from "@/components/icons/personal/Website logo — Small — 120 × 80@2x.png";
 import "./globals.css";
 
 export const metadata: Metadata = {

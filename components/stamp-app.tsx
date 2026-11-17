@@ -1,17 +1,11 @@
 "use client";
 
 import Script from "next/script";
-import {
-  ArrowDownToLine,
-  ArrowUpFromLine,
-  ArrowUpRight,
-  Check,
-  Clock3,
-  FileSpreadsheet,
-  LoaderCircle,
-  LogOut,
-} from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
+import { StampPwa } from "@/components/stamp-pwa";
+import { StampDashboard, type ManualTimeEntry } from "@/components/stamp-dashboard";
+import { FileSpreadsheet, LoaderCircle } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 const TARGET_SHEET_NAME = "Triglav_Delovne_Ure";
@@ -20,6 +14,9 @@ const GOOGLE_SCOPE =
   "openid email https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/spreadsheets";
 const SHEETS_API = "https://sheets.googleapis.com/v4/spreadsheets";
 const DAY_MS = 86_400_000;
+const subscribeToMount = () => () => {};
+const getMountedSnapshot = () => true;
+const getServerMountedSnapshot = () => false;
 const SHEETS_EPOCH = Date.UTC(1899, 11, 30);
 
 function clearSavedSession() {
@@ -75,7 +72,7 @@ type SheetData = {
   rows: unknown[][];
 };
 type SearchState = "signed-out" | "searching" | "ready" | "not-found" | "error";
-type ClockAction = "arrival" | "departure" | null;
+type ClockAction = "arrival" | "departure" | "manual" | null;
 
 function sheetRange(tabTitle: string, range: string) {
   const escapedTitle = tabTitle.replace(/'/g, "''");
@@ -150,23 +147,19 @@ function decimalHours(value: unknown) {
 
 function dayHours(row: unknown[] | undefined) {
   if (!row) return 0;
+  const savedValue = row[4];
+  const hasSavedHours =
+    (typeof savedValue === "number" && Number.isFinite(savedValue)) ||
+    (typeof savedValue === "string" &&
+      savedValue.trim() !== "" &&
+      Number.isFinite(Number(savedValue.trim().replace(",", "."))));
+  if (hasSavedHours) return decimalHours(savedValue);
   const start = timeMinutes(row[2]);
   const end = timeMinutes(row[3]);
   if (start !== null && end !== null) {
     return Math.round((Math.max(0, end - start) / 60) * 10) / 10;
   }
   return decimalHours(row[4]);
-}
-
-function formatTime(minutes: number | null) {
-  if (minutes === null) return "— — : — —";
-  const normalized = ((minutes % 1440) + 1440) % 1440;
-  return `${String(Math.floor(normalized / 60)).padStart(2, "0")}:${String(normalized % 60).padStart(2, "0")}`;
-}
-
-function formatHours(hours: number) {
-  if (Math.abs(hours) < 0.05) return "0 h";
-  return `${new Intl.NumberFormat("en-GB", { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(hours)} h`;
 }
 
 function weekday(date: Date) {
@@ -180,6 +173,27 @@ function errorMessage(error: unknown) {
 }
 
 export function StampApp() {
+  const mounted = useSyncExternalStore(
+    subscribeToMount,
+    getMountedSnapshot,
+    getServerMountedSnapshot,
+  );
+
+  if (!mounted) {
+    return (
+      <div className="stamp-app stamp-app-loading" role="status" aria-live="polite">
+        <span className="stamp-loading-mark" aria-hidden="true">
+          stamp<span>.</span>
+        </span>
+        <span>Loading your timecard…</span>
+      </div>
+    );
+  }
+
+  return <StampAppRuntime />;
+}
+
+function StampAppRuntime() {
   const tokenClient = useRef<GoogleTokenClient | null>(null);
   const restoredSession = useRef(false);
   const [state, setState] = useState<SearchState>("signed-out");
@@ -191,11 +205,16 @@ export function StampApp() {
   const [message, setMessage] = useState("");
   const [notice, setNotice] = useState("");
   const [needsReload, setNeedsReload] = useState(false);
+  const [breakLog, setBreakLog] = useState<{ startedAt: number | null; totalMs: number }>({
+    startedAt: null,
+    totalMs: 0,
+  });
+  const [breakLogReady, setBreakLogReady] = useState(false);
 
   useEffect(() => {
     const update = () => setNow(new Date());
     update();
-    const timer = window.setInterval(update, 30_000);
+    const timer = window.setInterval(update, 1_000);
     return () => window.clearInterval(timer);
   }, []);
 
@@ -370,6 +389,37 @@ export function StampApp() {
 
   const today = now;
   const todayKey = today ? localDateKey(today) : "";
+  const breakStorageKey =
+    accountEmail && todayKey ? "stamp-break-v1:" + accountEmail + ":" + todayKey : "";
+  useEffect(() => {
+    if (state !== "ready" || !data || !breakStorageKey) return;
+    setBreakLogReady(false);
+    try {
+      const saved = localStorage.getItem(breakStorageKey);
+      const parsed = saved
+        ? (JSON.parse(saved) as { startedAt?: number | null; totalMs?: number })
+        : {};
+      setBreakLog({
+        startedAt: typeof parsed.startedAt === "number" ? parsed.startedAt : null,
+        totalMs: typeof parsed.totalMs === "number" ? parsed.totalMs : 0,
+      });
+    } catch {
+      setBreakLog({ startedAt: null, totalMs: 0 });
+    }
+    setBreakLogReady(true);
+  }, [breakStorageKey, data, state]);
+  useEffect(() => {
+    if (!breakLogReady || !breakStorageKey) return;
+    try {
+      localStorage.setItem(breakStorageKey, JSON.stringify(breakLog));
+    } catch {
+      /* Keep this break in memory if storage is unavailable. */
+    }
+  }, [breakLog, breakLogReady, breakStorageKey]);
+  const activeBreakMs =
+    breakLog.totalMs +
+    (breakLog.startedAt && now ? Math.max(0, now.getTime() - breakLog.startedAt) : 0);
+  const isOnBreak = breakLog.startedAt !== null;
   const todayIndex =
     data && todayKey
       ? data.rows.findIndex((row, index) => index > 0 && rowDateKey(row[0]) === todayKey)
@@ -383,22 +433,29 @@ export function StampApp() {
   const isWorking = hasArrived && !hasDeparted;
   const completedToday = hasArrived && hasDeparted;
 
-  const monthHours = useMemo(() => {
-    if (!data || !today) return 0;
-    const month = todayKey.slice(0, 7);
-    return data.rows.reduce((total, row, index) => {
-      if (index === 0 || rowDateKey(row[0])?.slice(0, 7) !== month) return total;
-      return total + dayHours(row);
-    }, 0);
-  }, [data, today, todayKey]);
-
   const liveTodayHours = useMemo(() => {
     if (!isWorking || arrivalMinutes === null || !now) return dayHours(todayRow);
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
-    return Math.round((Math.max(0, currentMinutes - arrivalMinutes) / 60) * 10) / 10;
-  }, [arrivalMinutes, isWorking, now, todayRow]);
+    return (
+      Math.round(
+        (Math.max(0, currentMinutes - arrivalMinutes - activeBreakMs / 60_000) / 60) * 10,
+      ) / 10
+    );
+  }, [activeBreakMs, arrivalMinutes, isWorking, now, todayRow]);
 
-  const monthlyTotal = monthHours + (isWorking ? liveTodayHours : 0);
+  const workedSeconds =
+    isWorking && arrivalMinutes !== null && now
+      ? Math.max(
+          0,
+          Math.floor(
+            now.getHours() * 3600 +
+              now.getMinutes() * 60 +
+              now.getSeconds() -
+              arrivalMinutes * 60 -
+              activeBreakMs / 1000,
+          ),
+        )
+      : Math.round(dayHours(todayRow) * 3600);
 
   const writeValue = useCallback(
     async (range: string, values: unknown[][]) => {
@@ -427,7 +484,7 @@ export function StampApp() {
   }, [accessToken, data]);
 
   async function recordTime() {
-    if (!data || !accessToken || !now || action || completedToday) return;
+    if (!data || !accessToken || !now || action || completedToday || needsReload) return;
     const nextAction: ClockAction = isWorking ? "departure" : "arrival";
     const timeValue = (now.getHours() * 60 + now.getMinutes()) / 1440;
     setAction(nextAction);
@@ -493,7 +550,9 @@ export function StampApp() {
         await writeValue(`C${rowNumber}`, [[timeValue]]);
       } else {
         const start = arrivalMinutes ?? timeValue;
-        const hours = Math.round((Math.max(0, timeValue * 1440 - start) / 60) * 10) / 10;
+        const hours =
+          Math.round((Math.max(0, timeValue * 1440 - start - activeBreakMs / 60_000) / 60) * 10) /
+          10;
         const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
         if (now.getDate() === lastDay) {
           const monthKey = localDateKey(now).slice(0, 7);
@@ -567,6 +626,10 @@ export function StampApp() {
       }
 
       await refreshRows();
+      if (nextAction === "departure") {
+        setBreakLog({ startedAt: null, totalMs: 0 });
+        if (breakStorageKey) localStorage.removeItem(breakStorageKey);
+      }
       setNotice(
         nextAction === "arrival"
           ? "Arrival saved to your timecard."
@@ -591,6 +654,117 @@ export function StampApp() {
     ? today.getDate() === new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate()
     : false;
 
+  function toggleBreak() {
+    if (!now || !isWorking) return;
+    setBreakLog((current) =>
+      current.startedAt === null
+        ? { ...current, startedAt: now.getTime() }
+        : {
+            startedAt: null,
+            totalMs: current.totalMs + Math.max(0, now.getTime() - current.startedAt),
+          },
+    );
+  }
+
+  async function saveManualEntry(entry: ManualTimeEntry) {
+    if (!now || !data || !accessToken) throw new Error("Sign in before adding a time entry.");
+    const [year, month, day] = entry.date.split("-").map(Number);
+    const date = new Date(year, month - 1, day);
+    const [startHour, startMinute] = entry.start.split(":").map(Number);
+    const [endHour, endMinute] = entry.end.split(":").map(Number);
+    const startMinutes = startHour * 60 + startMinute;
+    let endMinutes = endHour * 60 + endMinute;
+    if (endMinutes <= startMinutes) endMinutes += 1440;
+    const workedHours = Math.round(((endMinutes - startMinutes) / 60) * 10) / 10;
+    const dateKey = localDateKey(date);
+    const rowIndex = entry.originalDate
+      ? data.rows.findIndex((row, index) => index > 0 && rowDateKey(row[0]) === entry.originalDate)
+      : -1;
+    const conflictingRow = data.rows.findIndex(
+      (row, index) => index > 0 && rowDateKey(row[0]) === dateKey && index !== rowIndex,
+    );
+    if (conflictingRow >= 1)
+      throw new Error(
+        "A time entry already exists for that date. Open it from the list to edit it.",
+      );
+    const rowNumber = rowIndex >= 1 ? rowIndex + 1 : null;
+    const values = [
+      [
+        weekday(new Date(Date.UTC(year, month - 1, day))),
+        startMinutes / 1440,
+        (endMinutes % 1440) / 1440,
+        workedHours,
+        entry.note.trim(),
+      ],
+    ];
+    setAction("manual");
+    setMessage("");
+    try {
+      if (rowNumber !== null) {
+        await writeValue("A" + rowNumber + ":F" + rowNumber, [[dateSerial(date), ...values[0]]]);
+      } else {
+        const range = sheetRange(data.tab.title, "A:F");
+        const url =
+          SHEETS_API +
+          "/" +
+          encodeURIComponent(data.file.id) +
+          "/values/" +
+          encodeURIComponent(range) +
+          ":append?valueInputOption=RAW&insertDataOption=INSERT_ROWS";
+        const result = await googleFetch<{ updates?: { updatedRange?: string } }>(
+          url,
+          accessToken,
+          {
+            method: "POST",
+            body: JSON.stringify({
+              range,
+              majorDimension: "ROWS",
+              values: [[dateSerial(date), ...values[0]]],
+            }),
+          },
+        );
+        const match = result.updates?.updatedRange?.match(/!A(\d+):/);
+        if (match) {
+          const addedRow = Number(match[1]);
+          const formats = [
+            { startColumnIndex: 0, endColumnIndex: 1, type: "DATE", pattern: "dd.MM.yyyy" },
+            { startColumnIndex: 2, endColumnIndex: 4, type: "TIME", pattern: "HH:mm" },
+            { startColumnIndex: 4, endColumnIndex: 5, type: "NUMBER", pattern: "0.0" },
+          ].map((format) => ({
+            repeatCell: {
+              range: {
+                sheetId: data.tab.sheetId,
+                startRowIndex: addedRow - 1,
+                endRowIndex: addedRow,
+                startColumnIndex: format.startColumnIndex,
+                endColumnIndex: format.endColumnIndex,
+              },
+              cell: {
+                userEnteredFormat: { numberFormat: { type: format.type, pattern: format.pattern } },
+              },
+              fields: "userEnteredFormat.numberFormat",
+            },
+          }));
+          await googleFetch(
+            SHEETS_API + "/" + encodeURIComponent(data.file.id) + ":batchUpdate",
+            accessToken,
+            {
+              method: "POST",
+              body: JSON.stringify({ requests: formats }),
+            },
+          );
+        }
+      }
+      await refreshRows();
+      setNotice("Time entry saved to your timecard.");
+    } catch (error) {
+      setMessage(errorMessage(error));
+      throw error;
+    } finally {
+      setAction(null);
+    }
+  }
+
   return (
     <div className="stamp-app">
       <Script
@@ -598,202 +772,56 @@ export function StampApp() {
         strategy="afterInteractive"
         onReady={initializeGoogle}
       />
-      <header className="stamp-topbar">
-        <a className="stamp-wordmark" href="/stamp" aria-label="Stamp home">
-          <span className="stamp-mark">S</span>
-          <span>stamp</span>
-        </a>
-        <span className="stamp-local-label">
-          <span /> Timecard
-        </span>
-      </header>
-
-      <div className="stamp-main">
-        <section className="stamp-intro" aria-labelledby="stamp-title">
-          <p className="stamp-eyebrow">STAMP · TIME TRACKER</p>
-          <h1 id="stamp-title">A gde je pečat?</h1>
-          <p className="stamp-date">
-            {today
-              ? new Intl.DateTimeFormat("en-GB", {
-                  weekday: "long",
-                  day: "numeric",
-                  month: "long",
-                }).format(today)
-              : "Your simple work timecard."}
-          </p>
-        </section>
-
-        <section className="stamp-card" aria-live="polite">
-          {state === "ready" && data ? (
-            <>
-              <div className="stamp-card-top">
-                <span className="stamp-status is-connected">
-                  <i /> Signed in{accountEmail ? ` · ${accountEmail}` : " with Google"}
-                </span>
-                <button
-                  className="stamp-signout"
-                  type="button"
-                  onClick={signOut}
-                  aria-label="Sign out"
-                >
-                  <LogOut size={16} />
-                </button>
-              </div>
-
-              <div className="stamp-timecard">
-                <div className="stamp-today-line">
-                  <div>
-                    <span className="stamp-eyebrow">TODAY</span>
-                    <strong>
-                      {today
-                        ? new Intl.DateTimeFormat("en-GB", {
-                            weekday: "long",
-                            timeZone: "UTC",
-                          }).format(
-                            new Date(
-                              Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()),
-                            ),
-                          )
-                        : "—"}
-                    </strong>
-                  </div>
-                  <div className="stamp-live-clock">
-                    <Clock3 size={15} />
-                    {today ? formatTime(today.getHours() * 60 + today.getMinutes()) : "— — : — —"}
-                  </div>
-                  <span
-                    className={`stamp-status-dot ${isWorking ? "is-working" : completedToday ? "is-done" : ""}`}
-                  >
-                    <i />
-                    {isWorking ? "At work" : completedToday ? "Done" : "Not started"}
-                  </span>
-                </div>
-
-                <div
-                  className={`stamp-action-panel ${isWorking ? "is-working" : completedToday ? "is-complete" : ""}`}
-                >
-                  <div
-                    className="stamp-action-icon"
-                    key={isWorking ? "departure" : completedToday ? "complete" : "arrival"}
-                  >
-                    {completedToday ? (
-                      <Check size={23} />
-                    ) : isWorking ? (
-                      <ArrowUpFromLine size={23} />
-                    ) : (
-                      <ArrowDownToLine size={23} />
-                    )}
-                  </div>
-                  <h2>
-                    {completedToday
-                      ? "You’re all set."
-                      : isWorking
-                        ? "Wrapping up?"
-                        : "Ready to start?"}
-                  </h2>
-                  <p>
-                    {completedToday
-                      ? "Your workday has been saved."
-                      : isWorking
-                        ? "Tap once more when you leave."
-                        : "Tap when you arrive at work."}
-                  </p>
-                  <button
-                    className={`stamp-clock-button ${isWorking ? "is-out" : ""} ${completedToday ? "is-complete" : ""}`}
-                    type="button"
-                    onClick={recordTime}
-                    disabled={Boolean(action) || completedToday || needsReload}
-                  >
-                    {action ? (
-                      <LoaderCircle size={18} className="stamp-spinner" />
-                    ) : completedToday ? (
-                      <Check size={18} />
-                    ) : isWorking ? (
-                      <ArrowUpFromLine size={18} />
-                    ) : (
-                      <ArrowDownToLine size={18} />
-                    )}
-                    {action === "arrival"
-                      ? "Saving arrival…"
-                      : action === "departure"
-                        ? "Saving departure…"
-                        : completedToday
-                          ? "Completed today"
-                          : isWorking
-                            ? "Mark departure"
-                            : "Mark arrival"}
-                  </button>
-                </div>
-
-                <div className="stamp-day-summary">
-                  <div>
-                    <span>ARRIVAL</span>
-                    <strong>{formatTime(arrivalMinutes)}</strong>
-                  </div>
-                  <div>
-                    <span>DEPARTURE</span>
-                    <strong>{formatTime(departureMinutes)}</strong>
-                  </div>
-                  <div>
-                    <span>HOURS TODAY</span>
-                    <strong>{formatHours(liveTodayHours)}</strong>
-                  </div>
-                </div>
-              </div>
-
-              <div className="stamp-month-card">
-                <div className="stamp-month-icon">
-                  <FileSpreadsheet size={17} />
-                </div>
-                <div className="stamp-month-copy">
-                  <span>
-                    {today
-                      ? new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(
-                          today,
-                        )
-                      : "This month"}
-                  </span>
-                  <strong>Hours worked</strong>
-                </div>
-                <div className="stamp-month-total">{formatHours(monthlyTotal)}</div>
-              </div>
-
-              {data.file.webViewLink ? (
-                <div className="stamp-sheet-link-row">
-                  <a
-                    className="stamp-open-sheet-button"
-                    href={data.file.webViewLink}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Open spreadsheet <ArrowUpRight size={15} />
-                  </a>
-                </div>
-              ) : null}
-              {onLastDay ? (
-                <p className="stamp-month-end-note">
-                  <Check size={14} /> Month total is added to NOTE when you clock out.
-                </p>
-              ) : null}
-              {notice ? (
-                <p className="stamp-success-message" role="status">
-                  <Check size={15} />
-                  {notice}
-                </p>
-              ) : null}
-              {message ? (
-                <div className="stamp-message is-error" role="alert">
-                  <p>{message}</p>
-                  {needsReload ? (
-                    <button type="button" onClick={signOut}>
-                      Reconnect to reload sheet
-                    </button>
-                  ) : null}
-                </div>
-              ) : null}
-            </>
-          ) : (
-            <>
+      {state === "ready" && data && now ? (
+        <StampDashboard
+          data={data}
+          accountEmail={accountEmail}
+          now={now}
+          isWorking={isWorking}
+          completedToday={completedToday}
+          isOnBreak={isOnBreak}
+          workedSeconds={workedSeconds}
+          action={action}
+          clockBlocked={needsReload}
+          liveTodayHours={liveTodayHours}
+          notice={notice}
+          error={message}
+          onClock={recordTime}
+          onToggleBreak={toggleBreak}
+          onSaveManual={saveManualEntry}
+          onSignOut={signOut}
+          onRefresh={() => {
+            if (!accessToken) {
+              signOut();
+              return;
+            }
+            setNeedsReload(false);
+            setMessage("");
+            void refreshRows().catch((error) => setMessage(errorMessage(error)));
+          }}
+        />
+      ) : (
+        <div className="stamp-connect-page">
+          <header className="stamp-connect-top">
+            <a className="stamp-mobile-brand" href="/stamp">
+              <Image src="/stamp/logo-master.svg" alt="" width={32} height={30} />
+              <strong>
+                stamp<span>.</span>
+              </strong>
+            </a>
+            <StampPwa />
+          </header>
+          <main className="stamp-connect-content">
+            <a className="stamp-connect-brand" href="/stamp" aria-label="Stamp home">
+              <Image src="/stamp/logo-master.svg" alt="" width={58} height={56} priority />
+              <strong>
+                stamp<span>.</span>
+              </strong>
+            </a>
+            <p className="stamp-eyebrow">YOUR WORK TIMECARD</p>
+            <h1>Make time count.</h1>
+            <p className="stamp-connect-lead">A little clarity for your working day.</p>
+            <section className="stamp-connect-panel">
               <div className="stamp-connect-heading">
                 <div className="stamp-connect-icon">
                   <FileSpreadsheet size={20} />
@@ -807,27 +835,27 @@ export function StampApp() {
                   </p>
                 </div>
               </div>
-              {busy ? (
+              {busy && (
                 <div className="stamp-searching">
                   <LoaderCircle size={19} className="stamp-spinner" /> Connecting to your timecard…
                 </div>
-              ) : null}
-              {state === "not-found" ? (
+              )}
+              {state === "not-found" && (
                 <div className="stamp-message" role="status">
                   No Google Sheets file named <strong>{TARGET_SHEET_NAME}</strong> was found in this
                   account.
                 </div>
-              ) : null}
-              {state === "error" && message ? (
+              )}
+              {state === "error" && message && (
                 <div className="stamp-message is-error" role="alert">
                   {message}
                 </div>
-              ) : null}
-              {!GOOGLE_CLIENT_ID ? (
+              )}
+              {!GOOGLE_CLIENT_ID && (
                 <p className="stamp-setup-note">
                   Add a Google OAuth web client ID to <code>.env.local</code> to enable sign-in.
                 </p>
-              ) : null}
+              )}
               <button
                 className="stamp-signin-button"
                 type="button"
@@ -840,10 +868,10 @@ export function StampApp() {
               <p className="stamp-privacy-note">
                 Sign in to let Stamp update this timecard in Google Sheets.
               </p>
-            </>
-          )}
-        </section>
-      </div>
+            </section>
+          </main>
+        </div>
+      )}
     </div>
   );
 }

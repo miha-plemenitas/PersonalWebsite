@@ -2,8 +2,8 @@
 
 import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
-import blackSmall from "@/components/icons/Website logo — Small — 120 × 80@2x.png";
-import whiteSmall from "@/components/icons/Website logo — White — Small — 120 × 81@2x.png";
+import blackSmall from "@/components/icons/personal/Website logo — Small — 120 × 80@2x.png";
+import whiteSmall from "@/components/icons/personal/Website logo — White — Small — 120 × 80@2x.png";
 
 type Theme = "light" | "dark";
 const THEME_SETTING_KEY = "theme";
@@ -29,9 +29,11 @@ export function ThemeToggle() {
       } else {
         document.documentElement.dataset.theme = nextTheme;
       }
-      document.querySelectorAll<HTMLLinkElement>('link[rel~="icon"]').forEach((icon) => {
-        icon.href = nextTheme === "dark" ? whiteSmall.src : blackSmall.src;
-      });
+      if (!window.location.pathname.startsWith("/stamp")) {
+        document.querySelectorAll<HTMLLinkElement>('link[rel~="icon"]').forEach((icon) => {
+          icon.href = nextTheme === "dark" ? whiteSmall.src : blackSmall.src;
+        });
+      }
     }
 
     applyTheme(storedTheme ?? (media.matches ? "dark" : "light"), storedTheme === null);
@@ -50,9 +52,11 @@ export function ThemeToggle() {
     document.documentElement.dataset.theme = nextTheme;
     window.localStorage.setItem(THEME_SETTING_KEY, nextTheme);
     window.localStorage.removeItem("theme-setting");
-    document.querySelectorAll<HTMLLinkElement>('link[rel~="icon"]').forEach((icon) => {
-      icon.href = nextTheme === "dark" ? whiteSmall.src : blackSmall.src;
-    });
+    if (!window.location.pathname.startsWith("/stamp")) {
+      document.querySelectorAll<HTMLLinkElement>('link[rel~="icon"]').forEach((icon) => {
+        icon.href = nextTheme === "dark" ? whiteSmall.src : blackSmall.src;
+      });
+    }
   }
 
   return (
