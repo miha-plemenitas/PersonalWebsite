@@ -183,7 +183,8 @@ export function StampApp() {
     return (
       <div className="stamp-app stamp-app-loading" role="status" aria-live="polite">
         <span className="stamp-loading-mark" aria-hidden="true">
-          stamp<span>.</span>
+          stamp
+          <span className="stamp-wordmark-dot" aria-hidden="true" />
         </span>
         <span>Loading your timecard…</span>
       </div>
@@ -806,7 +807,8 @@ function StampAppRuntime() {
             <a className="stamp-mobile-brand" href="/stamp">
               <Image src="/stamp/logo-master.svg" alt="" width={32} height={30} />
               <strong>
-                stamp<span>.</span>
+                stamp
+                <span className="stamp-wordmark-dot" aria-hidden="true" />
               </strong>
             </a>
             <StampPwa />
@@ -815,12 +817,14 @@ function StampAppRuntime() {
             <a className="stamp-connect-brand" href="/stamp" aria-label="Stamp home">
               <Image src="/stamp/logo-master.svg" alt="" width={58} height={56} priority />
               <strong>
-                stamp<span>.</span>
+                stamp
+                <span className="stamp-wordmark-dot" aria-hidden="true" />
               </strong>
             </a>
-            <p className="stamp-eyebrow">YOUR WORK TIMECARD</p>
             <h1>Make time count.</h1>
-            <p className="stamp-connect-lead">A little clarity for your working day.</p>
+            <p className="stamp-connect-lead">
+              Track work hours and save them to your Google Sheet.
+            </p>
             <section className="stamp-connect-panel">
               <div className="stamp-connect-heading">
                 <div className="stamp-connect-icon">

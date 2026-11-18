@@ -21,7 +21,7 @@ import {
   Sun,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type SheetData = {
   file: { id: string; name: string; mimeType: string; webViewLink?: string };
@@ -138,6 +138,7 @@ export function StampDashboard(p: Props) {
   const [view, setView] = useState<View>("overview");
   const [offset, setOffset] = useState(0);
   const [dialog, setDialog] = useState(false);
+  const entryDialog = useRef<HTMLDialogElement>(null);
   const [entry, setEntry] = useState<ManualTimeEntry>({
     date: keyOf(p.now),
     start: "09:00",
@@ -156,6 +157,11 @@ export function StampDashboard(p: Props) {
     monthlyGoal: "80",
   });
   const [loaded, setLoaded] = useState(false);
+  useEffect(() => {
+    const modal = entryDialog.current;
+    if (dialog && modal && !modal.open) modal.showModal();
+    else if (!dialog && modal?.open) modal.close();
+  }, [dialog]);
   useEffect(() => {
     try {
       const v = JSON.parse(localStorage.getItem(prefsKey) || "{}");
@@ -217,7 +223,7 @@ export function StampDashboard(p: Props) {
       : 0);
   const weekStart = new Date(p.now.getFullYear(), p.now.getMonth(), p.now.getDate());
   weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
-  const weekDays = Array.from({ length: 7 }, (_, i) => {
+  const weekDays = Array.from({ length: 5 }, (_, i) => {
     const date = new Date(weekStart);
     date.setDate(date.getDate() + i);
     const key = keyOf(date),
@@ -235,13 +241,13 @@ export function StampDashboard(p: Props) {
     : 0;
   const weekend = p.now.getDay() === 0 || p.now.getDay() === 6;
   const dayOff = weekend && !todayRow;
-  const tone = dayOff
-    ? p.now.getDay() === 6
-      ? "orange"
-      : "yellow"
-    : p.isWorking || p.completedToday
-      ? "crimson"
-      : "yellow";
+  const timerState = dayOff
+    ? "weekend"
+    : p.isWorking
+      ? "working"
+      : p.completedToday
+        ? "saved"
+        : "ready";
   const viewLabel = views.find((x) => x.id === view)?.label || "Overview";
 
   function openEntry(date = todayKey, row?: unknown[]) {
@@ -278,7 +284,7 @@ export function StampDashboard(p: Props) {
   function changeMonth(n: number) {
     setOffset((x) => x + n);
   }
-  function Nav({ mobile = false }: { mobile?: boolean }) {
+  function renderNav({ mobile = false }: { mobile?: boolean } = {}) {
     return (
       <nav className={mobile ? "stamp-bottom-nav" : "stamp-side-nav"} aria-label="Stamp sections">
         {views.map(({ id, label, Icon }) => (
@@ -296,9 +302,9 @@ export function StampDashboard(p: Props) {
       </nav>
     );
   }
-  function DailyCard() {
+  function renderDailyCard() {
     return (
-      <section className={"stamp-daily-card tone-" + tone}>
+      <section className="stamp-daily-card" data-session={timerState}>
         <div className="stamp-daily-top">
           <div className="stamp-card-title">
             <Clock3 size={21} />
@@ -309,10 +315,10 @@ export function StampDashboard(p: Props) {
               "DAY OFF"
             ) : p.isWorking ? (
               <>
-                <i /> LIVE
+                <i /> {p.isOnBreak ? "ON BREAK" : "CLOCKED IN"}
               </>
             ) : p.completedToday ? (
-              "SAVED"
+              "CLOCKED OUT"
             ) : (
               "READY"
             )}
@@ -340,10 +346,7 @@ export function StampDashboard(p: Props) {
           </div>
         ) : (
           <>
-            <div className="stamp-clock-display">
-              {clockDisplay(p.workedSeconds)}
-              {p.isOnBreak ? " · BREAK" : ""}
-            </div>
+            <div className="stamp-clock-display">{clockDisplay(p.workedSeconds)}</div>
             <div className="stamp-goal-summary">
               <span>
                 {p.completedToday
@@ -353,7 +356,7 @@ export function StampDashboard(p: Props) {
               <b>{percent}%</b>
             </div>
             <div className="stamp-goal-track">
-              <i style={{ width: percent + "%" }} />
+              <i style={{ transform: `scaleX(${percent / 100})` }} />
             </div>
             <div className="stamp-goal-caption">
               <span>Daily goal · {dailyGoal}h</span>
@@ -410,11 +413,11 @@ export function StampDashboard(p: Props) {
       </section>
     );
   }
-  function WeeklyCard() {
+  function renderWeeklyCard() {
     return (
       <section className="stamp-week-card">
         <div className="stamp-section-head">
-          <h2>Your week</h2>
+          <h2>Your workweek</h2>
           <button
             className="stamp-icon-link"
             type="button"
@@ -429,7 +432,7 @@ export function StampDashboard(p: Props) {
           <span>/ {weeklyGoal}h goal</span>
           <span className="stamp-week-range">
             {fmt(weekStart, { day: "numeric", month: "short" })}–
-            {fmt(new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + 6), {
+            {fmt(weekDays[weekDays.length - 1].date, {
               day: "numeric",
               month: "long",
             })}
@@ -437,10 +440,10 @@ export function StampDashboard(p: Props) {
         </div>
         <div
           className="stamp-week-chart"
-          role="img"
-          aria-label={"This week: " + duration(weekTotal) + " of " + weeklyGoal + " hours"}
+          role="group"
+          aria-label={"Monday to Friday: " + duration(weekTotal) + " of " + weeklyGoal + " hours"}
         >
-          {weekDays.map((d, i) => (
+          {weekDays.map((d) => (
             <button
               type="button"
               key={d.key}
@@ -459,13 +462,11 @@ export function StampDashboard(p: Props) {
             >
               <span className="stamp-bar-track">
                 <i
-                  className={d.hours ? (i === 0 ? "is-complete" : "is-today-fill") : ""}
                   style={{
-                    height:
-                      Math.max(
-                        d.hours ? 10 : 0,
-                        Math.min(100, (d.hours / Math.max(1, weeklyGoal / 5)) * 100),
-                      ) + "%",
+                    transform: `scaleY(${Math.max(
+                      d.hours ? 0.1 : 0,
+                      Math.min(1, d.hours / Math.max(1, weeklyGoal / 5)),
+                    )})`,
                   }}
                 />
                 {d.hours > 0 && <b>{d.hours.toFixed(d.hours % 1 ? 1 : 0)}h</b>}
@@ -478,11 +479,11 @@ export function StampDashboard(p: Props) {
       </section>
     );
   }
-  function Metrics() {
+  function renderMetrics() {
     const extra = Math.max(0, monthTotal - monthlyGoal);
     return (
       <div className="stamp-insight-cards">
-        <button className="stamp-insight-card tone-black" onClick={() => setView("timecard")}>
+        <button className="stamp-insight-card tone-carmine" onClick={() => setView("timecard")}>
           <span>
             <CalendarDays size={19} /> This month <ArrowUpRight size={19} />
           </span>
@@ -490,44 +491,42 @@ export function StampDashboard(p: Props) {
           <small>
             of {monthlyGoal}h monthly goal · {monthPercent}%
           </small>
-          <i style={{ width: Math.min(100, monthPercent) + "%" }} />
+          <span className="stamp-metric-progress" aria-hidden="true">
+            <i style={{ transform: `scaleX(${monthPercent / 100})` }} />
+          </span>
         </button>
-        <button className="stamp-insight-card tone-yellow" onClick={() => setView("insights")}>
+        <button className="stamp-insight-card tone-marigold" onClick={() => setView("insights")}>
           <span>
             <ChartNoAxesColumnIncreasing size={19} /> Extra hours <ArrowUpRight size={19} />
           </span>
           <strong>+{duration(extra)}</strong>
           <small>
-            {extra
-              ? "Above your " + monthlyGoal + "h monthly goal"
-              : "Keep building your monthly total"}
+            {extra ? "Above your " + monthlyGoal + "h monthly goal" : "No hours above target yet"}
           </small>
         </button>
-        <button className="stamp-insight-card tone-orange" onClick={() => setView("insights")}>
+        <button className="stamp-insight-card tone-buckthorn" onClick={() => setView("insights")}>
           <span>
             <Clock3 size={19} /> Goal completion <ArrowUpRight size={19} />
           </span>
           <strong>{monthPercent}%</strong>
           <small>
             {monthPercent >= 100
-              ? "Goal reached · keep tracking"
+              ? "Monthly goal reached"
               : duration(monthlyGoal - monthTotal) + " to monthly goal"}
           </small>
         </button>
       </div>
     );
   }
-  function Activity({ full = false }: { full?: boolean }) {
-    const list = full ? monthRows : rows.slice(0, 4);
+  function renderActivity() {
+    const list = rows.slice(0, 4);
     return (
-      <section className="stamp-recent-card">
+      <section className="stamp-recent-card stamp-activity-card">
         <div className="stamp-recent-head">
-          <h2>{full ? "Entries" : "Recent activity"}</h2>
-          {!full && (
-            <button className="stamp-text-link" type="button" onClick={() => setView("timecard")}>
-              View timecard <ArrowUpRight size={18} />
-            </button>
-          )}
+          <h2>Recent activity</h2>
+          <button className="stamp-text-link" type="button" onClick={() => setView("timecard")}>
+            View timecard <ArrowUpRight size={18} />
+          </button>
         </div>
         <div className="stamp-recent-table">
           <div className="stamp-table-head">
@@ -586,26 +585,27 @@ export function StampDashboard(p: Props) {
       </section>
     );
   }
-  const heading = (label: string, title: string) => (
+  const heading = (title: string) => (
     <div className="stamp-view-heading">
       <div>
-        <p className="stamp-eyebrow">{label}</p>
         <h1>{title}</h1>
       </div>
     </div>
   );
-  function Timecard() {
+  function renderTimecard() {
     return (
       <section className="stamp-page-view">
-        {heading("YOUR WORK TIMECARD", "Timecard")}
+        {heading("Timecard")}
         <div className="stamp-month-switch">
-          <button onClick={() => changeMonth(-1)} aria-label="Previous month">
-            <ChevronLeft size={19} />
-          </button>
-          <strong>{monthName(month)}</strong>
-          <button onClick={() => changeMonth(1)} aria-label="Next month">
-            <ChevronRight size={19} />
-          </button>
+          <div className="stamp-month-stepper" role="group" aria-label="Choose month">
+            <button type="button" onClick={() => changeMonth(-1)} aria-label="Previous month">
+              <ChevronLeft size={19} />
+            </button>
+            <strong aria-live="polite">{monthName(month)}</strong>
+            <button type="button" onClick={() => changeMonth(1)} aria-label="Next month">
+              <ChevronRight size={19} />
+            </button>
+          </div>
           <button className="stamp-primary-button" onClick={() => openEntry()}>
             <Plus size={18} /> Add entry
           </button>
@@ -644,13 +644,13 @@ export function StampDashboard(p: Props) {
       </section>
     );
   }
-  function Insights() {
-    const max = Math.max(8, ...monthRows.map((x) => hours(x.row)));
+  function renderInsights() {
+    const max = monthRows.reduce((peak, { row }) => Math.max(peak, hours(row)), dailyGoal);
     const avg = monthRows.length ? monthTotal / monthRows.length : 0;
     return (
       <section className="stamp-page-view">
-        {heading("MONTHLY OVERVIEW", "Insights")}
-        <Metrics />
+        {heading("Insights")}
+        {renderMetrics()}
         <section className="stamp-recent-card stamp-insights-chart">
           <div className="stamp-section-head">
             <h2>Daily hours</h2>
@@ -686,7 +686,7 @@ export function StampDashboard(p: Props) {
       </section>
     );
   }
-  function Settings() {
+  function renderSettings() {
     const setting = (
       key: GoalKey,
       label: string,
@@ -709,7 +709,9 @@ export function StampDashboard(p: Props) {
             onBlur={() => {
               const parsed = Number(goalDrafts[key]);
               const next =
-                Number.isFinite(parsed) && parsed > 0 ? Math.min(max, Math.round(parsed)) : value;
+                Number.isFinite(parsed) && parsed > 0
+                  ? Math.max(1, Math.min(max, Math.round(parsed)))
+                  : value;
               set(next);
               setGoalDrafts((current) => ({ ...current, [key]: String(next) }));
             }}
@@ -723,7 +725,7 @@ export function StampDashboard(p: Props) {
     );
     return (
       <section className="stamp-page-view">
-        {heading("MAKE STAMP YOURS", "Settings")}
+        {heading("Settings")}
         <section className="stamp-settings-card">
           <div className="stamp-settings-title">
             <div>
@@ -753,7 +755,7 @@ export function StampDashboard(p: Props) {
             <h2>Google Sheets</h2>
             <p>{p.accountEmail}</p>
             <p className="stamp-save-state">
-              <Check size={15} /> All changes saved
+              <Check size={15} /> Connected
             </p>
           </div>
           <button className="stamp-secondary-button" onClick={p.onRefresh}>
@@ -786,17 +788,18 @@ export function StampDashboard(p: Props) {
         <a href="/stamp" className="stamp-dashboard-brand">
           <Image src="/stamp/logo-master.svg" alt="" width={34} height={32} priority />
           <strong>
-            stamp<span>.</span>
+            stamp
+            <span className="stamp-wordmark-dot" aria-hidden="true" />
           </strong>
           <small>YOUR WORK TIMECARD</small>
         </a>
-        <Nav />
+        {renderNav()}
         <div className="stamp-sidebar-bottom">
           <div className="stamp-connection-card">
             <CalendarDays size={19} />
             <strong>Google Sheets</strong>
             <small>
-              <Check size={13} /> All changes saved
+              <Check size={13} /> Connected
             </small>
           </div>
           <div className="stamp-user">
@@ -814,7 +817,7 @@ export function StampDashboard(p: Props) {
           </div>
           <div className="stamp-topbar-tools">
             <span className="stamp-sync-label">
-              <Check size={15} /> Sheet synced just now
+              <Check size={15} /> Google Sheets connected
             </span>
             <button
               className="stamp-theme-button round"
@@ -832,7 +835,8 @@ export function StampDashboard(p: Props) {
           <a className="stamp-mobile-brand" href="/stamp">
             <Image src="/stamp/logo-master.svg" alt="" width={36} height={34} />
             <strong>
-              stamp<span>.</span>
+              stamp
+              <span className="stamp-wordmark-dot" aria-hidden="true" />
             </strong>
           </a>
           <div className="stamp-mobile-actions">
@@ -882,16 +886,16 @@ export function StampDashboard(p: Props) {
                 </div>
               </div>
               <div className="stamp-overview-grid">
-                <DailyCard />
-                <WeeklyCard />
+                {renderDailyCard()}
+                {renderWeeklyCard()}
               </div>
-              <Metrics />
-              <Activity />
+              {renderMetrics()}
+              {renderActivity()}
             </section>
           )}
-          {view === "timecard" && <Timecard />}
-          {view === "insights" && <Insights />}
-          {view === "settings" && <Settings />}
+          {view === "timecard" && renderTimecard()}
+          {view === "insights" && renderInsights()}
+          {view === "settings" && renderSettings()}
           <footer className="stamp-dashboard-footer">
             <span>Stamp · A little clarity for your working day.</span>
             <span>Google Sheets connected</span>
@@ -911,94 +915,91 @@ export function StampDashboard(p: Props) {
           )}
         </div>
       </main>
-      <Nav mobile />
-      {dialog && (
-        <div
-          className="stamp-modal-backdrop"
-          onMouseDown={(e) => {
-            if (e.target === e.currentTarget) setDialog(false);
-          }}
-        >
-          <section
-            className="stamp-entry-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="stamp-entry-title"
+      {renderNav({ mobile: true })}
+      <dialog
+        ref={entryDialog}
+        className="stamp-entry-modal"
+        aria-labelledby="stamp-entry-title"
+        onClose={() => setDialog(false)}
+        onCancel={(event) => {
+          if (saving) event.preventDefault();
+        }}
+      >
+        <div className="stamp-modal-heading">
+          <div>
+            <h2 id="stamp-entry-title">
+              {entry.originalDate ? "Edit time entry" : "Add time entry"}
+            </h2>
+          </div>
+          <button
+            type="button"
+            disabled={saving}
+            onClick={() => setDialog(false)}
+            aria-label="Close"
           >
-            <div className="stamp-modal-heading">
-              <div>
-                <p className="stamp-eyebrow">GOOGLE SHEETS</p>
-                <h2 id="stamp-entry-title">Add time entry</h2>
-              </div>
-              <button onClick={() => setDialog(false)} aria-label="Close">
-                <X size={20} />
-              </button>
-            </div>
-            <form onSubmit={saveEntry}>
-              <label>
-                Date
-                <input
-                  type="date"
-                  required
-                  value={entry.date}
-                  onChange={(e) => setEntry({ ...entry, date: e.target.value })}
-                />
-              </label>
-              <div className="stamp-entry-time-fields">
-                <label>
-                  Arrival
-                  <input
-                    type="time"
-                    required
-                    value={entry.start}
-                    onChange={(e) => setEntry({ ...entry, start: e.target.value })}
-                  />
-                </label>
-                <label>
-                  Departure
-                  <input
-                    type="time"
-                    required
-                    value={entry.end}
-                    onChange={(e) => setEntry({ ...entry, end: e.target.value })}
-                  />
-                </label>
-              </div>
-              <label>
-                Note <span className="stamp-optional">Optional</span>
-                <input
-                  value={entry.note}
-                  maxLength={120}
-                  placeholder="Add a note"
-                  onChange={(e) => setEntry({ ...entry, note: e.target.value })}
-                />
-              </label>
-              {entryError && (
-                <p className="stamp-entry-error" role="alert">
-                  {entryError}
-                </p>
-              )}
-              <div className="stamp-modal-actions">
-                <button
-                  type="button"
-                  className="stamp-secondary-button"
-                  onClick={() => setDialog(false)}
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="stamp-primary-button" disabled={saving}>
-                  {saving ? (
-                    <LoaderCircle className="stamp-spinner" size={17} />
-                  ) : (
-                    <Check size={17} />
-                  )}
-                  Save entry
-                </button>
-              </div>
-            </form>
-          </section>
+            <X size={20} />
+          </button>
         </div>
-      )}
+        <form onSubmit={saveEntry}>
+          <label>
+            Date
+            <input
+              type="date"
+              required
+              value={entry.date}
+              onChange={(e) => setEntry({ ...entry, date: e.target.value })}
+            />
+          </label>
+          <div className="stamp-entry-time-fields">
+            <label>
+              Arrival
+              <input
+                type="time"
+                required
+                value={entry.start}
+                onChange={(e) => setEntry({ ...entry, start: e.target.value })}
+              />
+            </label>
+            <label>
+              Departure
+              <input
+                type="time"
+                required
+                value={entry.end}
+                onChange={(e) => setEntry({ ...entry, end: e.target.value })}
+              />
+            </label>
+          </div>
+          <label>
+            Note <span className="stamp-optional">Optional</span>
+            <input
+              value={entry.note}
+              maxLength={120}
+              placeholder="Add a note"
+              onChange={(e) => setEntry({ ...entry, note: e.target.value })}
+            />
+          </label>
+          {entryError && (
+            <p className="stamp-entry-error" role="alert">
+              {entryError}
+            </p>
+          )}
+          <div className="stamp-modal-actions">
+            <button
+              type="button"
+              className="stamp-secondary-button"
+              disabled={saving}
+              onClick={() => setDialog(false)}
+            >
+              Cancel
+            </button>
+            <button type="submit" className="stamp-primary-button" disabled={saving}>
+              {saving ? <LoaderCircle className="stamp-spinner" size={17} /> : <Check size={17} />}
+              Save entry
+            </button>
+          </div>
+        </form>
+      </dialog>
     </div>
   );
 }

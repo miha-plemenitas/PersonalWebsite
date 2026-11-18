@@ -3100,9 +3100,7 @@ body:has(.stamp-app) main {
   --sd-muted: #656565;
   --sd-line: #dedede;
   --sd-soft: #f2f2f2;
-  --sd-red: #e70d3d;
-  --sd-yellow: #ffe15c;
-  --sd-orange: #efa21b;
+  --sd-red: #dc143c;
   display: grid;
   min-height: 100vh;
   min-height: 100svh;
@@ -3117,15 +3115,6 @@ body:has(.stamp-app) main {
   --sd-muted: #a4a4a4;
   --sd-line: #363636;
   --sd-soft: #282828;
-  --sd-yellow: #f3d74f;
-  --sd-orange: #e99c20;
-}
-.stamp-dashboard[data-theme="dark"] .stamp-insight-card.tone-black {
-  background: #f4f4f4;
-  color: #080808;
-}
-.stamp-dashboard[data-theme="dark"] .stamp-insight-card.tone-black > i {
-  background: #080808;
 }
 .stamp-sidebar {
   position: sticky;
@@ -3143,7 +3132,7 @@ body:has(.stamp-app) main {
   grid-template-columns: 34px auto;
   grid-template-rows: 25px 14px;
   align-items: center;
-  gap: 2px 8px;
+  gap: 2px 4px;
   margin: 0 12px 58px;
   color: inherit;
   text-decoration: none;
@@ -3161,9 +3150,13 @@ body:has(.stamp-app) main {
   letter-spacing: -0.07em;
   line-height: 1;
 }
-.stamp-dashboard-brand strong span,
-.stamp-mobile-brand strong span {
-  color: var(--sd-red);
+.stamp-wordmark-dot {
+  display: inline-block;
+  width: 0.15em;
+  height: 0.15em;
+  margin-inline-start: 0.05em;
+  border-radius: 50%;
+  background: var(--sd-red, #dc143c);
 }
 .stamp-dashboard-brand small {
   grid-column: 2;
@@ -3305,7 +3298,7 @@ body:has(.stamp-app) main {
 .stamp-mobile-brand {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 3px;
   color: var(--sd-ink);
   text-decoration: none;
 }
@@ -3412,18 +3405,6 @@ body:has(.stamp-app) main {
 .stamp-daily-card {
   min-height: 336px;
 }
-.stamp-daily-card.tone-crimson {
-  background: var(--sd-red);
-  color: #fff;
-}
-.stamp-daily-card.tone-yellow {
-  background: var(--sd-yellow);
-  color: #080808;
-}
-.stamp-daily-card.tone-orange {
-  background: var(--sd-orange);
-  color: #080808;
-}
 .stamp-daily-top,
 .stamp-section-head {
   display: flex;
@@ -3489,18 +3470,11 @@ body:has(.stamp-app) main {
   margin: 12px 0;
   background: rgba(0, 0, 0, 0.16);
 }
-.tone-crimson .stamp-goal-track {
-  background: rgba(0, 0, 0, 0.22);
-}
 .stamp-goal-track i {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: #fff;
-}
-.tone-yellow .stamp-goal-track i,
-.tone-orange .stamp-goal-track i {
-  background: var(--sd-red);
+  background: currentColor;
 }
 .stamp-goal-caption {
   font-size: 10px;
@@ -3630,7 +3604,7 @@ body:has(.stamp-app) main {
 .stamp-week-chart {
   display: grid;
   height: 177px;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 12px;
   margin-top: 15px;
 }
@@ -3661,10 +3635,7 @@ body:has(.stamp-app) main {
   bottom: 0;
   left: 0;
   border-radius: 99px;
-  background: var(--sd-orange);
-}
-.stamp-week-day:not(:first-child) .stamp-bar-track i.is-today-fill {
-  background: var(--sd-red);
+  background: var(--stamp-day-fill);
 }
 .stamp-bar-track b {
   z-index: 1;
@@ -3736,24 +3707,6 @@ body:has(.stamp-app) main {
 }
 .stamp-insight-card > small {
   font-size: 10px;
-}
-.stamp-insight-card.tone-black {
-  background: #050505;
-  color: #fff;
-}
-.stamp-insight-card.tone-yellow {
-  background: var(--sd-yellow);
-}
-.stamp-insight-card.tone-orange {
-  background: var(--sd-orange);
-}
-.stamp-insight-card.tone-black > i {
-  position: absolute;
-  bottom: 15px;
-  left: 30%;
-  height: 4px;
-  border-radius: 99px;
-  background: #fff;
 }
 .stamp-recent-card {
   margin-top: 20px;
@@ -3899,18 +3852,27 @@ body:has(.stamp-app) main {
 }
 .stamp-month-switch {
   display: flex;
-  min-height: 54px;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
-  gap: 14px;
-  border-radius: 999px;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--sd-line);
+  border-radius: var(--sd-radius);
   background: var(--sd-surface);
-  padding: 5px 12px;
+  padding: 8px;
 }
-.stamp-month-switch > button:not(.stamp-primary-button) {
+.stamp-month-stepper {
   display: grid;
-  width: 36px;
-  height: 36px;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  flex: 0 1 16rem;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+.stamp-month-stepper > button {
+  display: grid;
+  width: 44px;
+  height: 44px;
   place-items: center;
   border: 0;
   border-radius: 50%;
@@ -3918,12 +3880,9 @@ body:has(.stamp-app) main {
   color: var(--sd-ink);
   cursor: pointer;
 }
-.stamp-month-switch .stamp-primary-button {
-  position: absolute;
-  right: 32px;
-}
-.stamp-month-switch {
-  position: relative;
+.stamp-month-switch > .stamp-primary-button {
+  min-height: 44px;
+  margin-inline-start: auto;
 }
 .stamp-timecard-table {
   margin-top: 0;
@@ -4069,18 +4028,14 @@ body:has(.stamp-app) main {
 .stamp-account-card .stamp-save-state {
   margin-top: 9px;
 }
-.stamp-modal-backdrop {
-  position: fixed;
-  z-index: 50;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  overflow: auto;
+.stamp-entry-modal::backdrop {
   background: rgba(0, 0, 0, 0.45);
-  padding: 20px;
 }
 .stamp-entry-modal {
-  width: min(100%, 460px);
+  width: min(calc(100% - 32px), 460px);
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  overflow: auto;
   border-radius: 20px;
   background: var(--sd-surface);
   padding: 24px;
@@ -4180,7 +4135,8 @@ body:has(.stamp-app) main {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 12px;
+  gap: 6px;
+  width: fit-content;
   margin: 0 0 28px;
   color: #080808;
   text-decoration: none;
@@ -4195,9 +4151,6 @@ body:has(.stamp-app) main {
   font-weight: 800;
   letter-spacing: -0.075em;
   line-height: 1;
-}
-.stamp-connect-brand strong span {
-  color: #e70d3d;
 }
 .stamp-connect-content h1 {
   margin: 10px 0;
@@ -4217,8 +4170,8 @@ body:has(.stamp-app) main {
 }
 .stamp-connect-icon {
   border-radius: 14px;
-  background: #fce8ed;
-  color: #e70d3d;
+  background: color-mix(in srgb, var(--sd-red) 10%, var(--sd-surface));
+  color: var(--sd-red);
 }
 .stamp-connect-panel .stamp-connect-heading {
   padding: 25px 22px;
@@ -4252,7 +4205,7 @@ body:has(.stamp-app) main {
 .stamp-dashboard button:focus-visible,
 .stamp-connect-page button:focus-visible,
 .stamp-connect-page a:focus-visible {
-  outline: 3px solid color-mix(in srgb, #e70d3d 55%, transparent);
+  outline: 3px solid color-mix(in srgb, var(--sd-red) 55%, transparent);
   outline-offset: 3px;
 }
 @media (max-width: 900px) {
@@ -4266,7 +4219,7 @@ body:has(.stamp-app) main {
     display: none;
   }
   .stamp-content {
-    padding: 24px 20px 96px;
+    padding: 24px 20px calc(104px + env(safe-area-inset-bottom, 0px));
   }
   .stamp-mobile-header {
     display: flex;
@@ -4293,24 +4246,43 @@ body:has(.stamp-app) main {
   .stamp-bottom-nav {
     position: fixed;
     z-index: 30;
-    right: 0;
-    bottom: 0;
-    left: 0;
+    right: max(12px, env(safe-area-inset-right, 0px));
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    left: max(12px, env(safe-area-inset-left, 0px));
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    border-top: 1px solid var(--sd-line);
+    gap: 2px;
+    max-width: 440px;
+    margin-inline: auto;
+    border: 1px solid var(--sd-line);
+    border-radius: 26px;
     background: var(--sd-surface);
-    padding: 6px 12px max(8px, env(safe-area-inset-bottom));
+    padding: 5px;
+    box-shadow: 0 8px 28px rgb(23 18 21 / 18%);
+  }
+  @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .stamp-bottom-nav {
+      background: color-mix(in srgb, var(--sd-surface) 84%, transparent);
+      -webkit-backdrop-filter: blur(16px) saturate(145%);
+      backdrop-filter: blur(16px) saturate(145%);
+    }
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .stamp-bottom-nav {
+      background: var(--sd-surface);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
   }
   .stamp-bottom-nav .stamp-nav-item {
     width: 100%;
     min-width: 0;
-    min-height: 62px;
+    min-height: 54px;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 4px;
-    border-radius: 18px;
+    border-radius: 20px;
     padding: 0 3px;
     font-size: 9px;
     text-align: center;
@@ -4336,7 +4308,7 @@ body:has(.stamp-app) main {
     display: none;
   }
   .stamp-content {
-    padding: 12px 16px calc(92px + env(safe-area-inset-bottom));
+    padding: 12px 16px calc(104px + env(safe-area-inset-bottom, 0px));
   }
   .stamp-mobile-header {
     padding: 13px 16px 0;
@@ -4478,13 +4450,6 @@ body:has(.stamp-app) main {
   .stamp-page-view {
     gap: 14px;
   }
-  .stamp-month-switch {
-    justify-content: center;
-  }
-  .stamp-month-switch .stamp-primary-button {
-    position: static;
-    margin-left: auto;
-  }
   .stamp-timecard-table .stamp-table-head {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -4543,7 +4508,7 @@ body:has(.stamp-app) main {
     padding-top: 42px;
   }
   .stamp-connect-brand {
-    gap: 9px;
+    gap: 4px;
     margin-bottom: 22px;
   }
   .stamp-connect-brand img {
@@ -4600,14 +4565,6 @@ body:has(.stamp-app) main {
     height: 40px;
     min-height: 40px;
   }
-  .stamp-month-switch {
-    width: 100%;
-    border-radius: 22px;
-  }
-  .stamp-month-switch .stamp-primary-button {
-    position: static;
-    margin-left: auto;
-  }
 }
 
 /* Stamp loading and interaction motion */
@@ -4624,38 +4581,63 @@ body:has(.stamp-app) main {
   font-size: 12px;
 }
 .stamp-loading-mark {
-  display: flex;
-  align-items: center;
-  gap: 6px;
   color: #080808;
   font-size: 30px;
   font-weight: 800;
   letter-spacing: -0.07em;
 }
-.stamp-loading-mark span {
-  color: #e70d3d;
+.stamp-app {
+  --stamp-press-release: cubic-bezier(0.2, 1.4, 0.3, 1);
+  --stamp-motion-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
-.stamp-dashboard button,
-.stamp-connect-page button,
-.stamp-dashboard a[href],
-.stamp-connect-page a[href] {
+.stamp-app :is(button, a[href]) {
   transition:
-    transform 360ms cubic-bezier(0.2, 1.4, 0.3, 1),
+    transform 220ms var(--stamp-press-release),
     background-color 180ms ease,
     color 180ms ease,
     border-color 180ms ease,
     box-shadow 180ms ease;
   transform-origin: center;
 }
-.stamp-dashboard button:active:not(:disabled),
-.stamp-connect-page button:active:not(:disabled),
-.stamp-dashboard a[href]:active,
-.stamp-connect-page a[href]:active {
-  transform: scale(0.92);
-  transition-duration: 75ms;
-  transition-timing-function: ease-out;
+.stamp-app :is(button:not(:disabled), a[href]):active {
+  transform: scale(0.96);
+  transition-duration: 85ms;
+  transition-timing-function: var(--stamp-motion-out);
 }
-.stamp-nav-item,
+.stamp-app :is(.stamp-icon-link, .stamp-text-link, .stamp-theme-button, .stamp-nav-item) svg,
+.stamp-app .stamp-insight-card > span:first-child svg:last-child,
+.stamp-app :is(.stamp-month-stepper, .stamp-month-select) button svg {
+  transition: transform 180ms var(--stamp-press-release);
+}
+.stamp-app :is(.stamp-icon-link, .stamp-text-link):active svg,
+.stamp-app .stamp-insight-card:active > span:first-child svg:last-child {
+  transform: translate(2px, -2px);
+}
+.stamp-app :is(.stamp-theme-button, .stamp-nav-item):active svg {
+  transform: scale(0.9);
+}
+.stamp-app :is(.stamp-month-stepper, .stamp-month-select) button:first-child:active svg {
+  transform: translateX(-2px);
+}
+.stamp-app :is(.stamp-month-stepper, .stamp-month-select) button:last-child:active svg {
+  transform: translateX(2px);
+}
+.stamp-app :is(.stamp-goal-track, .stamp-metric-progress, .stamp-bar-track) > i {
+  transition: transform 220ms var(--stamp-motion-out);
+}
+.stamp-app :is(.stamp-goal-track, .stamp-metric-progress) > i {
+  width: 100%;
+  transform-origin: left;
+}
+.stamp-app .stamp-bar-track > i {
+  height: 100%;
+  transform-origin: bottom;
+}
+.stamp-daily-card[data-session] {
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
+}
 .stamp-month-select,
 .stamp-settings-card,
 .stamp-setting-row,
@@ -4665,25 +4647,19 @@ body:has(.stamp-app) main {
     border-color 180ms ease,
     box-shadow 180ms ease;
 }
-.stamp-setting-row input {
+.stamp-app input {
   transition:
     border-color 160ms ease,
     box-shadow 160ms ease,
     background-color 160ms ease;
 }
+.stamp-entry-modal input:focus {
+  border-color: var(--sd-red);
+}
 .stamp-setting-row input:focus {
   border-color: var(--sd-red);
   outline: none;
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--sd-red) 18%, transparent);
-}
-.stamp-icon-link svg,
-.stamp-month-select button svg,
-.stamp-month-switch button svg,
-.stamp-insight-card > span svg {
-  transition: transform 180ms ease;
-}
-.stamp-theme-button svg {
-  transition: transform 220ms ease;
 }
 .stamp-overview-view {
   animation: stamp-enter 220ms ease-out both;
@@ -4691,10 +4667,7 @@ body:has(.stamp-app) main {
 .stamp-install-help {
   animation: stamp-enter 160ms ease-out both;
 }
-.stamp-modal-backdrop {
-  animation: stamp-fade-in 140ms ease-out both;
-}
-.stamp-entry-modal {
+.stamp-entry-modal[open] {
   animation: stamp-enter 180ms cubic-bezier(0.2, 0.7, 0.25, 1) both;
 }
 .stamp-toast {
@@ -4708,14 +4681,6 @@ body:has(.stamp-app) main {
   to {
     opacity: 1;
     translate: 0 0;
-  }
-}
-@keyframes stamp-fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
   }
 }
 @keyframes stamp-toast-in {
@@ -4737,6 +4702,10 @@ body:has(.stamp-app) main {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+  .stamp-app :is(button:not(:disabled), a[href]):active,
+  .stamp-app :is(button:not(:disabled), a[href]):active svg {
+    transform: none !important;
+  }
 }
 @media (hover: hover) and (pointer: fine) {
   .stamp-dashboard button:hover:not(:disabled):not(:active),
@@ -4754,5 +4723,416 @@ body:has(.stamp-app) main {
   }
   .stamp-primary-button:hover {
     filter: none;
+  }
+}
+
+/* Stamp's warm paper surfaces and pigment accents. */
+.stamp-dashboard,
+.stamp-connect-page {
+  --sd-page: #faf2ed;
+  --sd-surface: #fffaf7;
+  --sd-ink: #301d1a;
+  --sd-muted: #6b504a;
+  --sd-line: #ead8d0;
+  --sd-soft: #f5e7df;
+  --sd-pastel-base: #fff7f0;
+  --sd-red: #dc143c;
+  --sd-focus: #960018;
+  --sd-radius: 16px;
+  accent-color: var(--sd-red);
+}
+
+.stamp-dashboard[data-theme="dark"] {
+  color-scheme: dark;
+  --sd-page: #201517;
+  --sd-surface: #2b1c1d;
+  --sd-ink: #fff0ea;
+  --sd-muted: #dfbfb6;
+  --sd-line: #4e3433;
+  --sd-soft: #3c2928;
+  --sd-focus: #ffb19d;
+}
+
+.stamp-dashboard .stamp-install-button {
+  border-color: var(--sd-line);
+  color: var(--sd-ink);
+}
+
+.stamp-dashboard .stamp-install-help {
+  border-color: var(--sd-line);
+  background: var(--sd-surface);
+  color: var(--sd-ink);
+}
+
+.stamp-dashboard .stamp-install-help :is(p, button) {
+  color: var(--sd-muted);
+}
+
+.stamp-dashboard ::selection,
+.stamp-connect-page ::selection {
+  color: var(--sd-ink);
+  background: color-mix(in srgb, var(--sd-red) 25%, var(--sd-surface));
+}
+
+.stamp-dashboard :is(button, input, a):focus-visible,
+.stamp-connect-page :is(button, a):focus-visible {
+  outline: 2px solid var(--sd-focus);
+  outline-offset: 3px;
+}
+
+.stamp-daily-card :is(button, a):focus-visible {
+  outline-color: currentColor;
+}
+
+.stamp-sidebar,
+.stamp-account-card {
+  overflow-wrap: anywhere;
+}
+
+.stamp-nav-item.is-active,
+.stamp-nav-item.is-active:hover {
+  background: color-mix(in srgb, var(--sd-red) 12%, var(--sd-surface));
+  color: var(--sd-focus);
+  font-weight: 750;
+}
+
+.stamp-content {
+  max-width: 1240px;
+}
+.stamp-page-heading h1,
+.stamp-view-heading h1,
+.stamp-connect-content h1 {
+  letter-spacing: -0.04em;
+  line-height: 1.04;
+}
+
+.stamp-daily-card,
+.stamp-week-card,
+.stamp-recent-card,
+.stamp-settings-card,
+.stamp-entry-modal,
+.stamp-connect-panel {
+  border: 1px solid var(--sd-line);
+  border-radius: var(--sd-radius);
+}
+
+.stamp-daily-card[data-session] {
+  border-color: transparent;
+}
+
+.stamp-daily-card[data-session="ready"] {
+  color: #382306;
+  background: color-mix(in srgb, #e49b0f 29%, var(--sd-pastel-base));
+}
+
+.stamp-daily-card[data-session="working"] {
+  color: #960018;
+  background: color-mix(in srgb, var(--sd-red) 22%, var(--sd-pastel-base));
+}
+
+.stamp-daily-card[data-session="saved"] {
+  color: #6e3530;
+  background: color-mix(in srgb, #6e3530 18%, var(--sd-pastel-base));
+}
+
+.stamp-daily-card[data-session="weekend"] {
+  color: #3f230d;
+  background: color-mix(in srgb, #ef9548 42%, var(--sd-pastel-base));
+}
+
+.stamp-daily-card .stamp-clock-display {
+  font-size: clamp(2.4rem, 6vw, 4.75rem);
+  letter-spacing: -0.04em;
+}
+.stamp-session-pill {
+  width: auto;
+  padding-inline: 12px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+.stamp-goal-caption {
+  font-size: 12px;
+}
+
+.stamp-bar-track {
+  border-radius: 8px;
+}
+.stamp-bar-track i {
+  border-radius: inherit;
+}
+.stamp-week-day:nth-child(1) {
+  --stamp-day-fill: #960018;
+}
+.stamp-week-day:nth-child(2) {
+  --stamp-day-fill: #e34234;
+}
+.stamp-week-day:nth-child(3) {
+  --stamp-day-fill: #fc7903;
+}
+.stamp-week-day:nth-child(4) {
+  --stamp-day-fill: #bf3b26;
+}
+.stamp-week-day:nth-child(5) {
+  --stamp-day-fill: #eaa221;
+}
+.stamp-bar-track b {
+  margin-bottom: 5px;
+  padding: 1px 3px;
+  border-radius: 3px;
+  background: var(--sd-surface);
+  color: var(--sd-ink);
+}
+.stamp-week-day-label {
+  font-size: 12px;
+}
+
+.stamp-insight-cards {
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--sd-line);
+  border-radius: var(--sd-radius);
+  background: var(--sd-line);
+}
+
+.stamp-dashboard .stamp-insight-card {
+  min-height: 144px;
+  border-radius: 0;
+  background: var(--sd-surface);
+  color: var(--sd-ink);
+  text-align: left;
+}
+
+.stamp-dashboard .stamp-insight-card:focus-visible {
+  outline-offset: -4px;
+}
+
+.stamp-insight-card > span:first-child {
+  grid-template-columns: auto 1fr auto;
+  text-align: left;
+}
+
+.stamp-insight-card > strong {
+  font-variant-numeric: tabular-nums;
+}
+.stamp-dashboard .stamp-insight-card.tone-carmine {
+  --stamp-metric-ink: #45191c;
+  --stamp-metric-accent: #960018;
+  background: color-mix(in srgb, #960018 13%, var(--sd-pastel-base));
+}
+
+.stamp-dashboard .stamp-insight-card.tone-marigold {
+  --stamp-metric-ink: #351e0a;
+  --stamp-metric-accent: #5c290d;
+  background: color-mix(in srgb, #eaa221 30%, var(--sd-pastel-base));
+}
+
+.stamp-dashboard .stamp-insight-card.tone-buckthorn {
+  --stamp-metric-ink: #452411;
+  --stamp-metric-accent: #861717;
+  background: color-mix(in srgb, #ef9548 37%, var(--sd-pastel-base));
+}
+
+.stamp-dashboard .stamp-insight-card {
+  color: var(--stamp-metric-ink, var(--sd-ink));
+}
+
+.stamp-insight-card > small,
+.stamp-insight-card > span:first-child svg {
+  color: var(--stamp-metric-accent, var(--sd-muted));
+}
+
+.stamp-insight-card > small {
+  font-size: 12px;
+}
+
+.stamp-dashboard .stamp-insight-card:focus-visible {
+  outline-color: var(--stamp-metric-accent, var(--sd-focus));
+}
+.stamp-insight-card > .stamp-metric-progress {
+  display: block;
+  height: 4px;
+  margin-top: 10px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: color-mix(in srgb, currentColor 15%, transparent);
+}
+.stamp-metric-progress i {
+  display: block;
+  height: 100%;
+  background: var(--stamp-metric-accent, var(--sd-red));
+}
+
+.stamp-primary-button {
+  background: var(--sd-red);
+}
+.stamp-month-select > button {
+  width: 40px;
+  min-height: 44px;
+}
+.stamp-text-link {
+  min-height: 44px;
+}
+.stamp-setting-row input,
+.stamp-entry-modal input {
+  min-height: 44px;
+  font-size: 16px;
+}
+.stamp-entry-time-fields > label {
+  min-width: 0;
+}
+.stamp-entry-modal button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+.stamp-entry-error {
+  color: var(--sd-focus);
+}
+
+.stamp-connect-page {
+  color: var(--sd-ink);
+}
+.stamp-connect-top {
+  border-color: var(--sd-line);
+}
+.stamp-app .stamp-connect-content {
+  padding-top: clamp(40px, 8vh, 100px);
+}
+.stamp-connect-brand {
+  color: var(--sd-ink);
+}
+.stamp-connect-lead {
+  color: var(--sd-muted);
+  font-size: 16px;
+  line-height: 1.55;
+}
+.stamp-connect-panel {
+  background: var(--sd-surface);
+  box-shadow: none;
+}
+.stamp-connect-panel .stamp-connect-heading p {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.stamp-connect-panel .stamp-signin-button {
+  border-radius: 10px;
+  min-height: 48px;
+}
+.stamp-connect-panel .stamp-privacy-note {
+  font-size: 12px;
+}
+
+@media (max-width: 900px) {
+  .stamp-mobile-header {
+    padding-top: max(12px, env(safe-area-inset-top));
+  }
+  .stamp-bottom-nav .stamp-nav-item {
+    font-size: 11px;
+  }
+  .stamp-bottom-nav .stamp-nav-item.is-active,
+  .stamp-bottom-nav .stamp-nav-item.is-active:hover {
+    background: color-mix(in srgb, var(--sd-red) 14%, var(--sd-surface));
+  }
+  .stamp-toast {
+    bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+  }
+  .stamp-mobile-header .stamp-theme-button.round {
+    flex: none;
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (max-width: 620px) {
+  .stamp-daily-card .stamp-clock-display {
+    font-size: clamp(2.4rem, 13vw, 4rem);
+  }
+  .stamp-month-select,
+  .stamp-primary-button {
+    min-height: 44px;
+  }
+  .stamp-heading-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .stamp-week-chart {
+    gap: 4px;
+  }
+  .stamp-week-day {
+    padding-inline: 0;
+  }
+  .stamp-insight-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .stamp-dashboard .stamp-insight-card:first-child {
+    grid-column: 1 / -1;
+  }
+  .stamp-dashboard .stamp-insight-card:last-child {
+    display: flex;
+  }
+  .stamp-dashboard .stamp-insight-card {
+    min-height: 120px;
+    padding: 14px 12px;
+  }
+  .stamp-insight-card > span:first-child {
+    gap: 5px;
+  }
+  .stamp-insight-card > span:first-child svg {
+    width: 14px;
+  }
+  .stamp-timecard-table,
+  .stamp-insights-chart {
+    padding: 14px;
+    background: var(--sd-surface);
+  }
+  .stamp-timecard-table .stamp-table-head,
+  .stamp-timecard-row {
+    grid-template-columns: 1.3fr repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .stamp-timecard-table .stamp-table-head span:nth-child(2),
+  .stamp-timecard-table .stamp-table-head span:nth-child(3),
+  .stamp-timecard-row span:nth-child(2),
+  .stamp-timecard-row span:nth-child(3) {
+    display: initial;
+  }
+  .stamp-timecard-row {
+    font-size: 12px;
+  }
+  .stamp-activity-card {
+    padding: 12px 16px 16px;
+    background: var(--sd-surface);
+  }
+  .stamp-activity-card .stamp-recent-head {
+    margin-bottom: 4px;
+  }
+  .stamp-activity-card .stamp-recent-table {
+    overflow: visible;
+    border-radius: 0;
+    background: transparent;
+    padding: 0;
+  }
+  .stamp-activity-card .stamp-data-caption {
+    margin-top: 12px;
+    overflow-wrap: anywhere;
+    text-align: start;
+  }
+  .stamp-month-stepper {
+    flex: 1 1 12.25rem;
+  }
+}
+
+@media (max-width: 390px) {
+  .stamp-month-stepper {
+    flex: 1 1 100%;
+  }
+  .stamp-month-switch > .stamp-primary-button {
+    width: 100%;
+    margin: 0;
+  }
+}
+
+@media (pointer: coarse) {
+  .stamp-app :is(button, a) {
+    touch-action: manipulation;
   }
 }
