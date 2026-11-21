@@ -1,234 +1,283 @@
-import Link from "next/link";
-import { ArrowDown, ArrowRight, ArrowUpRight, Mail, MapPin } from "lucide-react";
-import { BuildingBlocks } from "@/components/building-blocks";
+import type { Metadata } from "next";
+import { ArrowDown, ArrowRight, ArrowUp, ArrowUpRight } from "lucide-react";
+import { PixelMountains } from "@/components/portfolio/pixel-mountains";
+import { Button } from "@/components/ui/button";
+import { PortfolioHeader } from "@/components/portfolio/portfolio-header";
+import styles from "@/components/portfolio/portfolio.module.css";
 import { projects, skillGroups } from "@/lib/resume";
+import { toolboxTools } from "@/lib/tools";
 
-function SectionHeading({
-  number,
-  label,
-  title,
-  muted,
-}: {
-  number: string;
-  label: string;
-  title: string;
-  muted?: string;
-}) {
-  return (
-    <div className="section-heading" data-reveal>
-      <div className="section-kicker">
-        <span>{number}</span>
-        <span className="section-kicker-line" />
-        <span>{label}</span>
-      </div>
-      <h2 className="section-title">
-        {title}
-        {muted && (
-          <>
-            <br />
-            <span>{muted}</span>
-          </>
-        )}
-      </h2>
-    </div>
-  );
-}
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
-function ProjectRow({ project, index }: { project: (typeof projects)[number]; index: number }) {
-  return (
-    <a
-      href={project.href}
-      target="_blank"
-      rel="noreferrer"
-      className="project-row"
-      data-reveal
-      aria-label={`View ${project.name} on GitHub`}
-    >
-      <span className="project-index">0{index + 1}</span>
-      <div>
-        <p className="project-meta">
-          {project.role} · {project.period}
-        </p>
-        <h3>{project.name}</h3>
-        <p className="project-description">{project.description}</p>
-        <div className="mt-5 flex flex-wrap gap-2">
-          {project.technologies.map((technology) => (
-            <span className="tech-pill" key={technology}>
-              {technology}
-            </span>
-          ))}
-        </div>
-      </div>
-      <span className="project-arrow">
-        <ArrowUpRight size={22} />
-      </span>
-    </a>
-  );
-}
+const name = "Miha Plemenitaš";
+const email = "miha.plemenitas@gmail.com";
+const github = "https://github.com/miha-plemenitas";
+const tools = toolboxTools.filter(({ status }) => status === "available");
+const projectPixels = [
+  ["00001", "00101", "00111", "10111", "11111"],
+  ["01110", "10101", "10111", "10001", "01110"],
+  ["11100", "10010", "10101", "01001", "00111"],
+];
 
 export default function Home() {
   return (
-    <>
-      <section className="hero-section">
-        <div className="site-container">
-          <div className="hero-copy">
-            <div className="availability" data-reveal>
-              <span className="availability-dot" />
-              01 / Software engineer · Slovenia
-            </div>
-            <h1 className="hero-title" data-reveal>
-              “Life is short,
-              <br />
-              but the craft is long<span>.</span>”
-            </h1>
-            <p className="hero-quote-credit" data-reveal>— Hippocrates</p>
-            <p className="hero-intro" data-reveal>
-              I&apos;m Miha, a software engineer interested in thoughtful interfaces, reliable systems,
-              and the small details that make software feel clear.
-            </p>
-            <div className="hero-actions" data-reveal>
-              <a className="primary-action" href="#selected-work">
-                Explore selected work <ArrowDown className="action-down-arrow" size={16} />
-              </a>
-              <a className="text-action" href="mailto:miha.plemenitas@gmail.com">
-                <Mail size={15} /> Get in touch
-              </a>
-            </div>
-          </div>
-          <div className="hero-visual" data-reveal aria-hidden="true">
-            <BuildingBlocks />
-          </div>
-          <div className="hero-location"><MapPin size={13} /> Murska Sobota, SI <span>·</span> 46.6625° N / 16.1664° E</div>
-        </div>
-      </section>
-      <div className="marquee" aria-label="Technical disciplines">
-        <div className="marquee-track">
-          {[...Array(2)].flatMap((_, group) =>
-            [
-              "Software Engineering",
-              "Real-Time Telemetry",
-              "Data Acquisition",
-              "Data Visualization",
-              "Desktop Applications",
-              "Web Development",
-              "C# & .NET",
-              "React & TypeScript",
-              "Java & JavaFX",
-              "Data Systems",
-              "Relational Databases",
-              "NoSQL",
-              "UI/UX Design",
-              "Quality Assurance",
-              "Functional Testing",
-              "Playwright E2E",
-              "Test Automation",
-              "Docker & CI/CD",
-              "Code Reviews",
-              "Risk Analysis",
-            ].map((item) => (
-              <span key={`${group}-${item}`}>
-                {item} <i />
-              </span>
-            )),
-          )}
-        </div>
-      </div>
-      <section id="selected-work" className="page-section">
-        <div className="site-container">
-          <SectionHeading
-            number="01"
-            label="Selected work"
-            title="Systems built for"
-            muted="real use."
-          />
-          <nav className="project-index-nav" aria-label="Jump to a project">
-            {projects.map((project, index) => (
-              <a href={`#project-${index + 1}`} key={project.name}>
-                <span>0{index + 1}</span>
-                {project.name}
-                <ArrowUpRight size={13} />
-              </a>
-            ))}
-          </nav>
-          <div className="project-list">
-            {projects.map((project, index) => (
-              <div id={`project-${index + 1}`} key={project.name} className="project-anchor">
-                <ProjectRow project={project} index={index} />
-              </div>
-            ))}
-          </div>
-          <div className="mt-10 flex justify-end" data-reveal>
-            <Link className="text-action" href="/work">
-              Full project details <ArrowRight size={15} />
-            </Link>
-          </div>
-        </div>
-      </section>
-      <section id="resume" className="page-section section-tint">
-        <div className="site-container">
-          <SectionHeading
-            number="02"
-            label="Résumé"
-            title="Education and"
-            muted="technical range."
-          />
-          <div className="resume-grid">
-            <div className="resume-timeline" data-reveal>
-              <div className="timeline-item">
-                <span className="timeline-dot" />
-                <p className="timeline-date">2020 — 2024</p>
-                <h3>Bachelor&apos;s degree in Informatics and Communication Technology</h3>
-                <p>
-                  University of Maribor · Faculty of Electrical Engineering and Computer Science
-                </p>
-              </div>
-              <div className="timeline-item">
-                <span className="timeline-dot" />
-                <p className="timeline-date">2023 — Present</p>
-                <h3>Applied software projects</h3>
-                <p>
-                  Desktop applications, web products, data pipelines, test automation, and
-                  hardware-connected telemetry.
-                </p>
-              </div>
-              <div className="timeline-item">
-                <span className="timeline-dot" />
-                <p className="timeline-date">Languages</p>
-                <h3>Slovenian · English</h3>
-                <p>Native Slovenian speaker with advanced C1 English proficiency.</p>
+    <div className={styles.portfolio}>
+      <a className={styles.skip} href="#portfolio-main">
+        Skip to content
+      </a>
+      <PortfolioHeader />
+      <main id="portfolio-main" tabIndex={-1}>
+        <section
+          id="top"
+          className={`${styles.target} ${styles.hero}`}
+          aria-labelledby="hero-title"
+        >
+          <PixelMountains />
+          <div className={`${styles.wrap} ${styles.heroInner}`}>
+            <div className={styles.heroCopy} data-enter>
+              <p className={`${styles.label} ${styles.heroLabel}`}>Software engineer</p>
+              <h1 id="hero-title">{name}</h1>
+              <p className={styles.heroIntro}>
+                I build software with thoughtful interfaces, reliable systems, and attention to the
+                small details that make it easier to use.
+              </p>
+              <div className={styles.actions}>
+                <Button asChild className={styles.primary}>
+                  <a href="#selected-work">
+                    Explore my work <ArrowDown size={17} aria-hidden="true" />
+                  </a>
+                </Button>
+                <Button asChild variant="outline" className={styles.secondary}>
+                  <a href="#contact">
+                    Get in touch <ArrowUpRight size={17} aria-hidden="true" />
+                  </a>
+                </Button>
               </div>
             </div>
-            <div className="skills-grid">
-              {skillGroups.map((group, index) => (
-                <div
-                  className={`skill-group reveal-delay-${(index % 3) + 1}`}
-                  data-reveal
-                  key={group.label}
+            <div className={styles.heroFoot}>
+              <span>Murska Sobota, SI</span>
+              <a href="#selected-work" aria-label="Scroll to selected work">
+                <ArrowDown size={17} aria-hidden="true" />
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="selected-work"
+          tabIndex={-1}
+          className={`${styles.section} ${styles.work}`}
+          aria-labelledby="work-title"
+        >
+          <div className={styles.wrap}>
+            <div className={styles.sectionHead}>
+              <h2 id="work-title">Selected work</h2>
+              <p>Engineering projects across live telemetry, desktop software, and the web.</p>
+            </div>
+            <nav className={styles.projectIndex} aria-label="Jump to a project">
+              {projects.map((project, index) => (
+                <a key={project.name} href={`#project-${index + 1}`}>
+                  {project.name} <ArrowDown size={14} aria-hidden="true" />
+                </a>
+              ))}
+            </nav>
+            <ol className={styles.projectList}>
+              {projects.map((project, index) => (
+                <li key={project.name} id={`project-${index + 1}`} className={styles.target}>
+                  <article className={styles.project}>
+                    <div className={styles.projectHeading}>
+                      <span className={styles.projectPixels} aria-hidden="true">
+                        {Array.from(projectPixels[index]?.join("") ?? "", (pixel, pixelIndex) => (
+                          <span key={pixelIndex} data-lit={pixel === "1" || undefined} />
+                        ))}
+                      </span>
+                      <p className={styles.label}>
+                        {project.role} · {project.period}
+                      </p>
+                      <h3>
+                        <a
+                          href={project.href}
+                          className={styles.projectLink}
+                          target="_blank"
+                          rel="noreferrer"
+                          aria-label={`${project.name} on GitHub`}
+                        >
+                          {project.name} <ArrowUpRight size={23} aria-hidden="true" />
+                        </a>
+                      </h3>
+                    </div>
+                    <div className={styles.projectBody}>
+                      <p>{project.description}</p>
+                      <ul className={styles.contributions}>
+                        {project.highlights.map((highlight) => (
+                          <li key={highlight}>{highlight}</li>
+                        ))}
+                      </ul>
+                      <ul className={styles.technologies} aria-label="Technologies">
+                        {project.technologies.map((technology) => (
+                          <li key={technology}>{technology}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </article>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        <section
+          id="about"
+          tabIndex={-1}
+          className={`${styles.section} ${styles.about}`}
+          aria-labelledby="about-title"
+        >
+          <div className={`${styles.wrap} ${styles.split}`}>
+            <div>
+              <h2 id="about-title" className={styles.label}>
+                About me
+              </h2>
+              <p className={styles.statement}>
+                Good software should feel simple<span>.</span>
+              </p>
+            </div>
+            <div className={styles.aboutBody}>
+              <p>
+                I care about flow and how a product looks, feels, and moves from one step to the
+                next.
+              </p>
+              <p>
+                My work sits between software engineering, UI/UX, and design. I like clear
+                structure, useful interfaces, and details that make a product easier to use.
+              </p>
+              <p>
+                I’m also interested in automation that removes repetitive work and gives people more
+                time for decisions that matter.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="resume"
+          tabIndex={-1}
+          className={`${styles.section} ${styles.resume}`}
+          aria-labelledby="resume-title"
+        >
+          <div className={styles.wrap}>
+            <div className={styles.sectionHead}>
+              <h2 id="resume-title">Résumé</h2>
+              <p>Experience, education, and technical skills.</p>
+            </div>
+            <div className={styles.split}>
+              <div>
+                <h3 className={styles.columnTitle}>Experience &amp; education</h3>
+                <ol className={styles.timeline}>
+                  <li>
+                    <p className={styles.label}>2023 — Present</p>
+                    <h4>Applied software projects</h4>
+                    <p>
+                      Desktop applications, web products, data pipelines, test automation, and
+                      hardware-connected telemetry.
+                    </p>
+                  </li>
+                  <li>
+                    <p className={styles.label}>2020 — 2024</p>
+                    <h4>Bachelor’s degree in Informatics and Communication Technology</h4>
+                    <p>
+                      University of Maribor · Faculty of Electrical Engineering and Computer Science
+                    </p>
+                  </li>
+                  <li>
+                    <h4>Slovenian · English</h4>
+                    <p>Native Slovenian speaker with advanced C1 English proficiency.</p>
+                  </li>
+                </ol>
+              </div>
+              <div>
+                <h3 className={styles.columnTitle}>Technical skills</h3>
+                <dl className={styles.skills}>
+                  {skillGroups.map((group) => (
+                    <div key={group.label}>
+                      <dt>{group.label}</dt>
+                      <dd>{group.items.join(", ")}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="toolbox"
+          tabIndex={-1}
+          className={`${styles.section} ${styles.toolbox}`}
+          aria-labelledby="toolbox-title"
+        >
+          <div className={styles.wrap}>
+            <div className={styles.sectionHead}>
+              <h2 id="toolbox-title">Toolbox</h2>
+              <p>Small utilities you can use right in your browser.</p>
+            </div>
+            <div className={styles.tools}>
+              {tools.map(({ slug, name, description, icon: Icon }) => (
+                <a
+                  className={styles.tool}
+                  key={slug}
+                  href={slug === "stamp" ? "/stamp" : `/toolbox/${slug}`}
                 >
-                  <p>{group.label}</p>
-                  <ul>
-                    {group.items.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                </div>
+                  <span className={styles.toolIcons}>
+                    <Icon size={28} aria-hidden="true" />
+                    <ArrowRight size={20} aria-hidden="true" />
+                  </span>
+                  <h3>{name}</h3>
+                  <p>{description}</p>
+                </a>
               ))}
             </div>
           </div>
-        </div>
-      </section>
-      <section className="page-section">
-        <div className="site-container contact-panel" data-reveal>
-          <div>
-            <p className="section-kicker mb-5">03 · Contact</p>
-            <h2>Have a practical problem worth solving?</h2>
+        </section>
+
+        <section
+          id="contact"
+          tabIndex={-1}
+          className={styles.contact}
+          aria-labelledby="contact-title"
+        >
+          <div className={`${styles.wrap} ${styles.contactInner}`}>
+            <div>
+              <h2 id="contact-title">Let’s talk.</h2>
+            </div>
+            <div className={styles.contactLinks}>
+              <Button asChild variant="ghost" className={styles.contactLink}>
+                <a href={`mailto:${email}`}>
+                  {email} <ArrowUpRight size={18} aria-hidden="true" />
+                </a>
+              </Button>
+              <Button asChild variant="ghost" className={styles.contactLink}>
+                <a href={github}>
+                  GitHub <ArrowUpRight size={18} aria-hidden="true" />
+                </a>
+              </Button>
+            </div>
           </div>
-          <a className="contact-link" href="mailto:miha.plemenitas@gmail.com">
-            <span>Start a conversation</span>
-            <ArrowUpRight size={26} />
-          </a>
+        </section>
+      </main>
+      <footer className={styles.footer}>
+        <div className={`${styles.wrap} ${styles.footerInner}`}>
+          <p>
+            © {new Date().getFullYear()} {name}
+          </p>
+          <Button asChild variant="ghost">
+            <a href="#top">
+              Back to top <ArrowUp size={15} aria-hidden="true" />
+            </a>
+          </Button>
         </div>
-      </section>
-    </>
+      </footer>
+    </div>
   );
 }

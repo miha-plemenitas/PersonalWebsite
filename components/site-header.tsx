@@ -49,16 +49,16 @@ export function SiteHeader() {
           <span>Miha Plemenitaš<span className="text-coral">.</span></span>
         </Link>
         <nav aria-label="Main navigation" className={`site-nav ${menuOpen ? "site-nav-open" : ""}`}>
-          <Link className="nav-item" href="/about" onClick={() => setMenuOpen(false)}>
+          <Link className="nav-item" href="/#about" onClick={() => setMenuOpen(false)}>
             About
           </Link>
-          <Link className="nav-item" href="/work" onClick={() => setMenuOpen(false)}>
+          <Link className="nav-item" href="/#selected-work" onClick={() => setMenuOpen(false)}>
             Work
           </Link>
           <Link className="nav-item" href="/#resume" onClick={() => setMenuOpen(false)}>
             Résumé
           </Link>
-          <Link className="nav-item" href="/toolbox" onClick={() => setMenuOpen(false)}>
+          <Link className="nav-item" href="/#toolbox" onClick={() => setMenuOpen(false)}>
             ToolBox
           </Link>
         </nav>

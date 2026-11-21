@@ -1,0 +1,216 @@
+div:has(> .header) {
+  --portfolio-header-height: 76px;
+}
+
+.header {
+  --rail-height: var(--portfolio-header-height, 76px);
+  --rail-ink: #111216;
+  --rail-blue: #1d2f80;
+  --rail-white: #fff;
+  --rail-hover: #edf0fa;
+  --rail-rule: #d5daeb;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  color: var(--rail-ink);
+  background: var(--rail-white);
+  border-bottom: 1px solid var(--rail-rule);
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: min(100% - 2 * var(--gutter, 1.25rem), var(--measure, 74rem));
+  min-height: calc(var(--rail-height) - 1px);
+  margin-inline: auto;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-height: 44px;
+  font-size: 0.875rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.brand img {
+  flex: none;
+  filter: invert(1);
+  image-rendering: pixelated;
+}
+
+.navList {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.desktopNav .navList {
+  gap: 2px;
+}
+
+.link,
+.menuToggle {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 0.875rem;
+  border-radius: 0;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.link {
+  position: relative;
+}
+
+.link[aria-current="location"],
+.menuToggle:active,
+.mobileMenu[open] .menuToggle {
+  background: var(--rail-blue);
+  color: var(--rail-white);
+}
+
+.link::after {
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  width: 4px;
+  height: 4px;
+  background: currentColor;
+  content: "";
+  opacity: 0;
+}
+
+.link[aria-current="location"]::after {
+  opacity: 1;
+}
+
+.header :is(.brand, .link, .menuToggle):focus-visible {
+  z-index: 1;
+  outline: 2px solid var(--rail-blue);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .brand:hover {
+    color: var(--rail-blue);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .link:not([aria-current]):hover,
+  .mobileMenu:not([open]) .menuToggle:hover {
+    background: var(--rail-hover);
+    color: var(--rail-blue);
+  }
+}
+
+.link:not([aria-current]):active {
+  background: var(--rail-hover);
+  color: var(--rail-blue);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.mobileMenu,
+.closeIcon,
+.closeLabel,
+.mobileMenu[open] :is(.openIcon, .openLabel) {
+  display: none;
+}
+
+@media (width < 48rem) {
+  div:has(> .header) {
+    --portfolio-header-height: 60px;
+  }
+
+  .desktopNav {
+    display: none;
+  }
+
+  .mobileMenu,
+  .mobileMenu[open] :is(.closeIcon, .closeLabel) {
+    display: block;
+  }
+
+  .menuToggle {
+    justify-content: space-between;
+    width: 6.25rem;
+    border: 1px solid var(--rail-blue);
+    color: var(--rail-blue);
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .menuToggle::-webkit-details-marker {
+    display: none;
+  }
+
+  .mobileNav {
+    position: absolute;
+    inset: 100% 0 auto;
+    max-height: calc(100dvh - var(--rail-height));
+    overflow-y: auto;
+    border-block: 1px solid var(--rail-rule);
+    background: var(--rail-white);
+  }
+
+  .mobileNav .navList {
+    display: block;
+    width: calc(100% - 2 * var(--gutter, 1.25rem));
+    margin-inline: auto;
+    padding-block: 0.375rem;
+  }
+
+  .mobileNav li + li {
+    border-top: 1px solid var(--rail-rule);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .brand,
+  .link,
+  .menuToggle {
+    transition:
+      background-color 150ms ease,
+      color 150ms ease,
+      transform 120ms var(--ease-out);
+  }
+
+  .link:active,
+  .menuToggle:active {
+    transform: translateY(1px);
+  }
+
+  .link::after {
+    transform: translateY(2px);
+    transition:
+      opacity 160ms ease,
+      transform 160ms var(--ease-out);
+  }
+
+  .link[aria-current="location"]::after {
+    transform: none;
+  }
+
+  .mobileMenu[open] .mobileNav {
+    animation: menu-in 160ms var(--ease-out) both;
+  }
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

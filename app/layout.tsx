@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
-import { RouteEffects } from "@/components/route-effects";
-import { ScrollProgress } from "@/components/scroll-progress";
+import { SharedSiteShell } from "@/components/shared-site-shell";
 import logoIcon from "@/components/icons/personal/Website logo — Small — 120 × 80@2x.png";
 import "./globals.css";
 
@@ -26,11 +24,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body>
-        <ScrollProgress />
-        <SiteHeader />
-        <RouteEffects />
-        <main className="min-h-[calc(100vh-13rem)]">{children}</main>
-        <SiteFooter />
+        <SharedSiteShell footer={<SiteFooter />}>{children}</SharedSiteShell>
       </body>
     </html>
   );

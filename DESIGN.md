@@ -1,44 +1,28 @@
-# Design system
+# Portfolio design reference
 
-The portfolio uses a restrained editorial style with cues from product directories: oversized typography, numbered labels, compact indexes, thin rules, and content arranged in clear rows. The ArtCraft Crafting Apps page is an inspiration for this structure, adapted to Miha’s portfolio and visual identity.
+The portfolio is a single scrolling page at `/`. Its visual system uses white surfaces, near-black ink, and a deep blue accent. Pixel details come from the brand mark and square geometry in the controls.
 
-## Visual direction
+## Color, type, and layout
 
-- **Palette:** warm paper `#f7f6f2`, deep ink `#1d211d`, and burgundy `#a61b45`. Dark mode uses near-black surfaces and warm white text. Keep burgundy as the main accent in both themes.
-- **Typography:** Manrope for display and body text; DM Mono for metadata, section numbers, and technical labels.
-- **Shape language:** square corners, thin borders, straight dividers, crisp grid cells, and minimal shadows. Avoid pill shapes and ornamental rounding in new components.
-- **Layout:** centered content capped at 1120px, generous vertical spacing, clear two-column desktop compositions, and responsive layouts that simplify on mobile.
-- **Texture:** no page-wide gradient or background grid. The animated building-block illustration may use its own square grid as a contained visual.
-- **Emphasis:** use burgundy for key words, section markers, links, selected states, and primary actions. Keep surrounding surfaces monochrome.
+| Role                                           | Value                |
+| ---------------------------------------------- | -------------------- |
+| Navigation rail and mobile panel               | White `#fff`         |
+| Navigation ink                                 | Near-black `#111216` |
+| Primary actions, current navigation, and focus | Blue `#1d2f80`       |
+| Navigation hover                               | Pale blue `#edf0fa`  |
+| Navigation rules                               | Blue-gray `#d5daeb`  |
 
-## Theme and navigation
+- Use Manrope for navigation, headings, and body text. Use DM Mono for compact metadata and technical labels.
+- Align the rail to the portfolio content gutter and cap its inner width at `74rem`.
+- Keep interactive surfaces square, with straight dividers and hard-edged state changes. Use blue fills with white text for selection. The current navigation link adds a small square marker.
+- Keep project, résumé, toolbox, and contact content in readable sections with clear headings and a consistent layout rhythm.
 
-- Follow the device’s light or dark preference by default on desktop and mobile.
-- The header toggle switches directly between light and dark and remembers the visitor’s explicit choice.
-- The fixed header gains a solid, lightly blurred surface after scrolling and hides while scrolling down; scrolling up reveals it.
-- Desktop navigation stays compact and uppercase. Mobile navigation opens as a full-width, square-edged panel with ruled links.
-- Keep the theme control and mobile menu aligned in the header and usable by keyboard and touch.
+## Navigation
 
-## Motion
+- The white rail stays sticky at the top in normal document flow. It measures 76px on desktop and 60px below `48rem`.
+- Desktop exposes the portfolio links in one row. Mobile uses an outlined Menu control with a native disclosure and a full-width white panel of ruled links. The control reads Close while expanded.
+- The brand links to `#top`. Work, About, Résumé, Toolbox, and Contact use `#selected-work`, `#about`, `#resume`, `#toolbox`, and `#contact`. Keep those fragment links native so direct URLs, scroll, and browser history work together.
+- The section in view is indicated visually and via `aria-current="location"`. Keyboard focus uses a visible blue outline. Leave room for the rail above anchored content.
+- Keep controls at least 44px high. Escape closes the mobile disclosure and returns focus to its summary. Link activation closes it and lets the browser navigate to the section.
 
-- Use short, restrained transitions to clarify state: staggered content reveals, slight link and card responses, arrow movement, and crisp tile feedback.
-- The hero illustration assembles square blocks with a snap-like motion. Puzzle answers use a short rectangular reveal; tile selection and success states use clear color and outline changes.
-- Avoid bounce, elastic movement, decorative rotation, large floating effects, and excessive blur.
-- Respect `prefers-reduced-motion`: remove nonessential animation and transitions and show reveal content immediately.
-
-## Page patterns
-
-- **Home:** the first screen features the full quote “Life is short, but the craft is long.” credited to Hippocrates, a concise introduction, clear calls to action, and the contained block illustration.
-- **About, Work, and ToolBox:** reuse numbered editorial headings, consistent page rhythm, compact indexes, and thin dividers.
-- **Projects:** present role, dates, description, technologies, and navigation in structured rows or square-edged case cards.
-- **Résumé:** use a timeline for education and experience, with a compact skills grid.
-- **ToolBox:** keep games and utilities consistent with the black, white, and burgundy palette. Use square tiles, buttons, controls, and feedback states.
-- **Footer:** keep contact links, brand mark, and location details concise and easy to scan.
-
-## Accessibility and content
-
-- Keep visible focus indicators and keyboard navigation usable.
-- Give every form control a visible or accessible label.
-- Pair color with text, shape, or position when communicating status.
-- Preserve readable contrast in both themes, including generated QR codes.
-- Keep descriptions concise and direct, and make interactive targets comfortable on touch screens.
+The header is implemented in `components/portfolio/portfolio-header.tsx` and `components/portfolio/portfolio-header.module.css`. Stamp is a separate app at `/stamp` with its own interface.

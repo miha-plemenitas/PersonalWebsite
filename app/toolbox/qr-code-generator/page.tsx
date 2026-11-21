@@ -12,7 +12,7 @@ export default function QrCodeGeneratorPage() {
   return (
     <section className="page-section">
       <div className="site-container">
-        <Link href="/toolbox" className="text-action">
+        <Link href="/#toolbox" className="text-action">
           <ArrowLeft size={15} /> Back to ToolBox
         </Link>
         <div className="mt-12">

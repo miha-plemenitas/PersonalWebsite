@@ -52,11 +52,11 @@
 * {
   box-sizing: border-box;
 }
-html {
+html:where(:has(> body > .shared-site-main)) {
   scroll-behavior: smooth;
   scroll-padding-top: 5rem;
 }
-body {
+body:where(:has(> .shared-site-main)) {
   background-color: var(--paper);
   color: var(--ink);
   font-family: "Manrope", sans-serif;
@@ -65,7 +65,7 @@ body {
     background-color 300ms ease,
     color 300ms ease;
 }
-body::before {
+body:where(:has(> .shared-site-main))::before {
   position: fixed;
   z-index: 100;
   inset: 0;
@@ -178,7 +178,7 @@ select:focus-visible {
   box-shadow: 0 8px 24px color-mix(in srgb, var(--ink) 5%, transparent);
   backdrop-filter: blur(16px);
 }
-main {
+:where(body:has(> .shared-site-main)) main {
   padding-top: 5rem;
 }
 .site-nav {
@@ -1516,17 +1516,17 @@ main {
   --glow-red: transparent;
   --glow-contrast: transparent;
 }
-body {
+body:where(:has(> .shared-site-main)) {
   background: var(--paper);
   font-family: "Manrope", sans-serif;
   isolation: isolate;
 }
-main,
-footer {
+:where(body:has(> .shared-site-main)) main,
+:where(body:has(> .shared-site-main)) footer {
   position: relative;
   z-index: 1;
 }
-body::before {
+body:where(:has(> .shared-site-main))::before {
   opacity: 0.035;
 }
 .site-container {
@@ -1570,7 +1570,7 @@ body::before {
   bottom: -0.55rem;
   height: 2px;
 }
-main {
+:where(body:has(> .shared-site-main)) main {
   padding-top: 76px;
 }
 .hero-section {
