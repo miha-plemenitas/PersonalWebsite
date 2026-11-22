@@ -1,0 +1,52 @@
+.reveal {
+  opacity: 1;
+  transform: none;
+}
+
+.armed:not(.revealed) {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.revealed {
+  animation: home-reveal 480ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+.resumeColumn,
+.toolReveal {
+  min-width: 0;
+}
+
+.toolReveal {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.toolReveal > :global(a) {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+@keyframes home-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .armed:not(.revealed) {
+    opacity: 1;
+    transform: none;
+  }
+
+  .revealed {
+    animation: none;
+  }
+}

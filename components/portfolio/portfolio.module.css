@@ -10,7 +10,11 @@
   --gutter: clamp(1.25rem, 5vw, 5.5rem);
   --measure: 74rem;
   --paper: #eef0fc;
+  --hero-scene: #101631;
   --hero-shadow: #14215b;
+  --work-surface: #f7f8ff;
+  --resume-surface: #f9f4ec;
+  --toolbox-surface: #f3f5ff;
   background: var(--white);
   color: var(--ink);
   font-family: "Manrope", system-ui, sans-serif;
@@ -64,7 +68,7 @@
   position: absolute;
   z-index: 1;
   inset: 0;
-  background: linear-gradient(90deg, #101631d9, #10163154 44%, transparent 69%);
+  background-image: linear-gradient(90deg, #101631d9, #10163154 44%, transparent 69%);
   pointer-events: none;
   content: "";
 }
@@ -215,7 +219,6 @@
 }
 
 .heroFoot {
-  border-top: 1px solid #8998d0;
   text-shadow: 0 1px 4px #070a16;
   color: #e2e7ff;
   font-family: "DM Mono", ui-monospace, monospace;
@@ -262,7 +265,7 @@
 }
 
 .sectionHead p {
-  max-width: 31ch;
+  max-width: 48ch;
   color: var(--muted);
   font-size: clamp(1rem, 1.8vw, 1.2rem);
 }
@@ -360,28 +363,6 @@
   border: 1px solid var(--line);
 }
 
-.about h2 {
-  margin-bottom: 1.25rem;
-  color: var(--accent);
-}
-
-.statement {
-  max-width: 12ch;
-  font-size: clamp(2.9rem, 6.6vw, 6.6rem);
-}
-
-.statement span {
-  color: var(--accent);
-}
-
-.aboutBody {
-  display: grid;
-  align-content: center;
-  gap: 1rem;
-  color: var(--muted);
-  font-size: clamp(1.05rem, 2vw, 1.25rem);
-}
-
 .columnTitle {
   padding-bottom: 0.85rem;
   border-bottom: 1px solid var(--ink);
@@ -415,10 +396,6 @@
   display: grid;
   grid-template-columns: minmax(7rem, 0.42fr) minmax(0, 1fr);
   gap: 0.5rem;
-}
-
-.toolbox {
-  border-top: 1px solid var(--line);
 }
 
 .tools {
@@ -516,7 +493,7 @@
   }
 
   .hero::after {
-    background: linear-gradient(180deg, #101631 10%, #10163175 37%, transparent 58%);
+    background-image: linear-gradient(180deg, #101631 10%, #10163175 37%, transparent 58%);
   }
 
   .heroInner {
@@ -684,13 +661,29 @@
 }
 
 .work {
-  background: #f7f8ff;
+  border-top: 1px solid var(--accent);
+  background-color: var(--work-surface);
+  background-image:
+    linear-gradient(rgb(29 47 128 / 3.2%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(29 47 128 / 3.2%) 1px, transparent 1px);
+  background-attachment: fixed;
+  background-size: 32px 32px;
+}
+
+.resume,
+.toolbox {
+  border-top: 1px solid var(--accent);
+}
+
+.contact {
+  border-top: 1px solid var(--light-accent);
 }
 
 .work .sectionHead,
 .resume .sectionHead,
 .toolbox .sectionHead {
-  border-top-color: var(--accent);
+  border-top: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line));
+  padding-top: clamp(1rem, 2.4vw, 1.75rem);
 }
 
 .work .sectionHead h2,
@@ -710,7 +703,7 @@
 
 .projectList > li:nth-child(2),
 .projectIndex a:nth-child(2),
-.tool:nth-child(2) {
+.toolReveal:nth-child(2) .tool {
   --panel: #eee9fb;
   --panel-hover: #e2dafa;
   --panel-ink: #493778;
@@ -719,7 +712,7 @@
 
 .projectList > li:nth-child(3),
 .projectIndex a:nth-child(3),
-.tool:nth-child(3) {
+.toolReveal:nth-child(3) .tool {
   --panel: #fbf0df;
   --panel-hover: #f7e7ca;
   --panel-ink: #75451d;
@@ -786,19 +779,13 @@
   color: var(--panel-ink);
 }
 
-.about {
-  background: #e3e9fb;
-}
-
-.aboutBody {
-  max-width: none;
-  border-inline-start: 3px solid var(--accent);
-  padding: clamp(1.1rem, 3vw, 2rem);
-  background: rgb(255 255 255 / 62%);
-}
-
 .resume {
-  background: #f9f4ec;
+  background-color: var(--resume-surface);
+  background-image:
+    linear-gradient(rgb(29 47 128 / 2.8%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(29 47 128 / 2.8%) 1px, transparent 1px);
+  background-attachment: fixed;
+  background-size: 32px 32px;
 }
 
 .resume .split > div {
@@ -812,7 +799,33 @@
 }
 
 .toolbox {
-  background: #f3f5ff;
+  background-color: var(--toolbox-surface);
+  background-image:
+    linear-gradient(rgb(29 47 128 / 3%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(29 47 128 / 3%) 1px, transparent 1px);
+  background-attachment: fixed;
+  background-size: 32px 32px;
+}
+
+.contact {
+  background-color: var(--accent);
+  background-image:
+    radial-gradient(ellipse at 88% 18%, rgb(203 212 255 / 16%), transparent 42%),
+    linear-gradient(rgb(203 212 255 / 5%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(203 212 255 / 5%) 1px, transparent 1px);
+  background-attachment: fixed;
+  background-size:
+    auto,
+    32px 32px,
+    32px 32px;
+}
+
+.footer {
+  background-image:
+    linear-gradient(rgb(203 212 255 / 5%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(203 212 255 / 5%) 1px, transparent 1px);
+  background-attachment: fixed;
+  background-size: 32px 32px;
 }
 
 .tools {
@@ -855,27 +868,5 @@
 @media (width < 48rem) {
   .tools {
     grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    :is(.project, .aboutBody, .resume .split > div, .tool) {
-      animation: panel-in linear both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 65%;
-    }
-  }
-}
-
-@keyframes panel-in {
-  from {
-    opacity: 0.72;
-    translate: 0 10px;
-  }
-
-  to {
-    opacity: 1;
-    translate: 0 0;
   }
 }

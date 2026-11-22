@@ -15,13 +15,15 @@ The portfolio is a single scrolling page at `/`. Its visual system uses white su
 - Use Manrope for navigation, headings, and body text. Use DM Mono for compact metadata and technical labels.
 - Align the rail to the portfolio content gutter and cap its inner width at `74rem`.
 - Keep interactive surfaces square, with straight dividers and hard-edged state changes. Use blue fills with white text for selection. The current navigation link adds a small square marker.
-- Keep project, résumé, toolbox, and contact content in readable sections with clear headings and a consistent layout rhythm.
+- Keep selected work, projects and skills, toolbox, and contact content in readable sections with clear headings and a consistent layout rhythm. A subtle 32px grid spans the content surfaces, contact, and footer on one shared alignment; keep the mountain hero free of the grid.
+- Keep section boundaries clean and direct, without pixel-transition bands or gradient handoffs.
+- Reveal major content blocks once as they enter view with a short fade and small upward movement. Keep the background grid static, and show content immediately when reduced motion is preferred.
 
 ## Navigation
 
 - The white rail stays sticky at the top in normal document flow. It measures 76px on desktop and 60px below `48rem`.
 - Desktop exposes the portfolio links in one row. Mobile uses an outlined Menu control with a native disclosure and a full-width white panel of ruled links. The control reads Close while expanded.
-- The brand links to `#top`. Work, About, Résumé, Toolbox, and Contact use `#selected-work`, `#about`, `#resume`, `#toolbox`, and `#contact`. Keep those fragment links native so direct URLs, scroll, and browser history work together.
+- The brand links to `#top`. Work, Projects & Skills, Toolbox, and Contact use `#selected-work`, `#resume`, `#toolbox`, and `#contact`. Keep those fragment links native so direct URLs, scroll, and browser history work together.
 - The section in view is indicated visually and via `aria-current="location"`. Keyboard focus uses a visible blue outline. Leave room for the rail above anchored content.
 - Keep controls at least 44px high. Escape closes the mobile disclosure and returns focus to its summary. Link activation closes it and lets the browser navigate to the section.
 

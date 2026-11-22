@@ -14,8 +14,7 @@ import styles from "./portfolio-header.module.css";
 
 const links = [
   ["Work", "selected-work"],
-  ["About", "about"],
-  ["Résumé", "resume"],
+  ["Projects & Skills", "resume"],
   ["Toolbox", "toolbox"],
   ["Contact", "contact"],
 ];
@@ -45,6 +44,7 @@ export function PortfolioHeader() {
   const menu = useRef<HTMLDetailsElement>(null);
   const header = useRef<HTMLElement>(null);
   const [current, setCurrent] = useState("");
+  const [compact, setCompact] = useState(false);
 
   useEffect(() => {
     const sections = links.flatMap(([, id]) => {
@@ -55,6 +55,7 @@ export function PortfolioHeader() {
 
     function updateSection() {
       frame = 0;
+      setCompact(window.scrollY > 48);
       // Use the reading area below the sticky header as the activation point.
       const readingLine = Math.max(
         (header.current?.offsetHeight ?? 0) + 16,
@@ -113,6 +114,7 @@ export function PortfolioHeader() {
     <header
       ref={header}
       className={styles.header}
+      data-compact={compact || undefined}
       onBlur={(event) => {
         if (
           event.relatedTarget &&

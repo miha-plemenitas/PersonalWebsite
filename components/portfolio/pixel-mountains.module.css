@@ -4,7 +4,7 @@
   inset: 0;
   overflow: hidden;
   pointer-events: none;
-  background: #101631;
+  background: var(--hero-scene, #101631);
 }
 
 .airglow,

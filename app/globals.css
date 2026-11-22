@@ -1518,6 +1518,11 @@ select:focus-visible {
 }
 body:where(:has(> .shared-site-main)) {
   background: var(--paper);
+  background-image:
+    radial-gradient(ellipse at 8% 18%, color-mix(in srgb, var(--coral) 5%, transparent), transparent 34rem),
+    radial-gradient(ellipse at 92% 58%, color-mix(in srgb, var(--sand-block) 8%, transparent), transparent 40rem),
+    repeating-linear-gradient(0deg, transparent 0 23px, color-mix(in srgb, var(--ink) 1.5%, transparent) 23px 24px),
+    repeating-linear-gradient(90deg, transparent 0 23px, color-mix(in srgb, var(--ink) 1.5%, transparent) 23px 24px);
   font-family: "Manrope", sans-serif;
   isolation: isolate;
 }
