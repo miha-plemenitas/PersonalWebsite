@@ -2,8 +2,9 @@
 
 import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
-import blackSmall from "@/components/icons/personal/Website logo — Small — 120 × 80@2x.png";
-import whiteSmall from "@/components/icons/personal/Website logo — White — Small — 120 × 80@2x.png";
+
+const lightFavicon = "/brand/miha-logo-light-small.png";
+const darkFavicon = "/brand/miha-logo-dark-small.png";
 
 type Theme = "light" | "dark";
 const THEME_SETTING_KEY = "theme";
@@ -31,7 +32,7 @@ export function ThemeToggle() {
       }
       if (!window.location.pathname.startsWith("/stamp")) {
         document.querySelectorAll<HTMLLinkElement>('link[rel~="icon"]').forEach((icon) => {
-          icon.href = nextTheme === "dark" ? whiteSmall.src : blackSmall.src;
+          icon.href = nextTheme === "dark" ? darkFavicon : lightFavicon;
         });
       }
     }
@@ -54,7 +55,7 @@ export function ThemeToggle() {
     window.localStorage.removeItem("theme-setting");
     if (!window.location.pathname.startsWith("/stamp")) {
       document.querySelectorAll<HTMLLinkElement>('link[rel~="icon"]').forEach((icon) => {
-        icon.href = nextTheme === "dark" ? whiteSmall.src : blackSmall.src;
+        icon.href = nextTheme === "dark" ? darkFavicon : lightFavicon;
       });
     }
   }

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { DailyWend } from "@/components/daily-wend";
+import { DailyWend } from "@/components/toolbox/daily-wend";
 
 export const metadata: Metadata = { title: "Daily Wend", description: "A small daily word-path puzzle by Miha Plemenitaš." };
 

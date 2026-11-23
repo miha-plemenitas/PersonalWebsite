@@ -1,5 +1,9 @@
 # Portfolio redesign
 
+> Historical brief: the redesign is now implemented. The homepage contains the portfolio sections;
+> `/about`, `/work`, and `/toolbox` remain legacy redirects configured in `next.config.ts`. Tool
+> detail pages and Stamp remain direct routes.
+
 The portfolio at `/` is a single-page Next.js site with an original animated pixel mountain range. The visual reference is [boat.dev](https://boat.dev/). Use its technical, graphic-led pacing as inspiration for the portfolio’s own content and visual identity.
 
 ## Design
@@ -7,7 +11,7 @@ The portfolio at `/` is a single-page Next.js site with an original animated pix
 - Build around black, white, and `#1d2f80`, with pale indigo and limited complementary highlights for depth.
 - Keep the introduction and primary actions as readable HTML in the hero. Use a low-resolution Canvas 2D scene and Motion for the decorative landscape. Give reduced-motion visitors a still scene.
 - Use square shadcn Button and Navigation Menu controls with consistent spacing and visible keyboard focus. Navigation targets the existing sections and reflects the section in view.
-- Preserve Work, About, Résumé, Toolbox, and Contact, including existing project anchors, project links, and direct utility URLs.
+- Keep Work, About, Résumé, Toolbox, and Contact on the homepage, including project anchors and links. Keep direct utility URLs available.
 
 ## Ownership and verification
 

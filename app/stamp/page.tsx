@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { StampApp } from "@/components/stamp-app";
+import { StampApp } from "@/components/stamp/stamp-app";
 
 export const metadata: Metadata = {
   title: "Stamp | Time tracker",

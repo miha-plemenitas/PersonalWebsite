@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { ArrowUpRight } from "lucide-react";
-import type { TinyTool } from "@/lib/tools";
+import type { TinyTool } from "@/components/toolbox/tools";
 
 export function ToolCard({ tool }: { tool: TinyTool }) {
   const Icon = tool.icon;

@@ -2,8 +2,18 @@
 
 import Script from "next/script";
 import Image from "next/image";
-import { StampPwa } from "@/components/stamp-pwa";
-import { StampDashboard, type ManualTimeEntry } from "@/components/stamp-dashboard";
+import { StampPwa } from "@/components/stamp/stamp-pwa";
+import { StampDashboard, type ManualTimeEntry } from "@/components/stamp/stamp-dashboard";
+import {
+  dayHours,
+  dateSerial,
+  errorMessage,
+  localDateKey,
+  rowDateKey,
+  sheetRange,
+  timeMinutes,
+  weekday,
+} from "@/components/stamp/stamp-sheet-utils";
 import { FileSpreadsheet, LoaderCircle } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 
@@ -13,11 +23,9 @@ const SESSION_STORAGE_KEY = "stamp-google-session-v1";
 const GOOGLE_SCOPE =
   "openid email https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/spreadsheets";
 const SHEETS_API = "https://sheets.googleapis.com/v4/spreadsheets";
-const DAY_MS = 86_400_000;
 const subscribeToMount = () => () => {};
 const getMountedSnapshot = () => true;
 const getServerMountedSnapshot = () => false;
-const SHEETS_EPOCH = Date.UTC(1899, 11, 30);
 
 function clearSavedSession() {
   try {
@@ -74,11 +82,6 @@ type SheetData = {
 type SearchState = "signed-out" | "searching" | "ready" | "not-found" | "error";
 type ClockAction = "arrival" | "departure" | "manual" | null;
 
-function sheetRange(tabTitle: string, range: string) {
-  const escapedTitle = tabTitle.replace(/'/g, "''");
-  return `'${escapedTitle}'!${range}`;
-}
-
 async function googleFetch<T>(url: string, token: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, {
     ...init,
@@ -99,77 +102,6 @@ async function googleFetch<T>(url: string, token: string, init?: RequestInit): P
     );
   }
   return body as T;
-}
-
-function localDateKey(date: Date) {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-}
-
-function dateSerial(date: Date) {
-  return Math.floor(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / DAY_MS) + 25569;
-}
-
-function rowDateKey(value: unknown): string | null {
-  if (typeof value === "number" && Number.isFinite(value)) {
-    const utcDate = new Date(SHEETS_EPOCH + Math.floor(value) * DAY_MS);
-    return `${utcDate.getUTCFullYear()}-${String(utcDate.getUTCMonth() + 1).padStart(2, "0")}-${String(utcDate.getUTCDate()).padStart(2, "0")}`;
-  }
-  if (typeof value !== "string") return null;
-  const text = value.trim();
-  const slovenianDate = text.match(/^(\d{1,2})\.\s*(\d{1,2})\.\s*(\d{4})/);
-  if (slovenianDate)
-    return `${slovenianDate[3]}-${slovenianDate[2].padStart(2, "0")}-${slovenianDate[1].padStart(2, "0")}`;
-  const isoDate = text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
-  return isoDate
-    ? `${isoDate[1]}-${isoDate[2].padStart(2, "0")}-${isoDate[3].padStart(2, "0")}`
-    : null;
-}
-
-function timeMinutes(value: unknown): number | null {
-  if (typeof value === "number" && Number.isFinite(value)) {
-    return Math.round((((value % 1) + 1) % 1) * 1440) % 1440;
-  }
-  if (typeof value === "string") {
-    const match = value.trim().match(/^(\d{1,2}):(\d{2})/);
-    if (match) return Number(match[1]) * 60 + Number(match[2]);
-  }
-  return null;
-}
-
-function decimalHours(value: unknown) {
-  if (typeof value === "number" && Number.isFinite(value)) return value;
-  if (typeof value === "string") {
-    const parsed = Number(value.trim().replace(",", "."));
-    if (Number.isFinite(parsed)) return parsed;
-  }
-  return 0;
-}
-
-function dayHours(row: unknown[] | undefined) {
-  if (!row) return 0;
-  const savedValue = row[4];
-  const hasSavedHours =
-    (typeof savedValue === "number" && Number.isFinite(savedValue)) ||
-    (typeof savedValue === "string" &&
-      savedValue.trim() !== "" &&
-      Number.isFinite(Number(savedValue.trim().replace(",", "."))));
-  if (hasSavedHours) return decimalHours(savedValue);
-  const start = timeMinutes(row[2]);
-  const end = timeMinutes(row[3]);
-  if (start !== null && end !== null) {
-    return Math.round((Math.max(0, end - start) / 60) * 10) / 10;
-  }
-  return decimalHours(row[4]);
-}
-
-function weekday(date: Date) {
-  return new Intl.DateTimeFormat("sl-SI", { weekday: "long", timeZone: "UTC" }).format(date);
-}
-
-function errorMessage(error: unknown) {
-  return error instanceof Error
-    ? error.message
-    : "Google Sheets could not be reached. Please try again.";
 }
 
 export function StampApp() {

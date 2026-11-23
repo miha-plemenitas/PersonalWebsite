@@ -4,8 +4,8 @@ import { PixelMountains } from "@/components/portfolio/pixel-mountains";
 import { Button } from "@/components/ui/button";
 import { PortfolioHeader } from "@/components/portfolio/portfolio-header";
 import styles from "@/components/portfolio/portfolio.module.css";
-import { projects, skillGroups } from "@/lib/resume";
-import { toolboxTools } from "@/lib/tools";
+import { projects, skillGroups } from "@/components/portfolio/data";
+import { toolboxTools } from "@/components/toolbox/tools";
 import { HomeReveal } from "@/components/portfolio/home-reveal";
 
 export const metadata: Metadata = {

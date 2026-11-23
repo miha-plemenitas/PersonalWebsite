@@ -1,10 +1,4 @@
-import Image, { type StaticImageData } from "next/image";
-import blackLarge from "@/components/icons/personal/Website logo — Large — 360 × 240@2x.png";
-import blackMedium from "@/components/icons/personal/Website logo — Medium — 240 × 160@2x.png";
-import blackSmall from "@/components/icons/personal/Website logo — Small — 120 × 80@2x.png";
-import whiteLarge from "@/components/icons/personal/Website logo — White — Large — 360 × 240@2x.png";
-import whiteMedium from "@/components/icons/personal/Website logo — White — Medium — 240 × 160@2x.png";
-import whiteSmall from "@/components/icons/personal/Website logo — White — Small — 120 × 80@2x.png";
+import Image from "next/image";
 
 type LogoSize = "small" | "medium" | "large";
 
@@ -14,10 +8,10 @@ const dimensions: Record<LogoSize, { width: number; height: number }> = {
   large: { width: 180, height: 120 },
 };
 
-const themeSources: Record<LogoSize, { light: StaticImageData; dark: StaticImageData }> = {
-  small: { light: blackSmall, dark: whiteSmall },
-  medium: { light: blackMedium, dark: whiteMedium },
-  large: { light: blackLarge, dark: whiteLarge },
+const themeSources: Record<LogoSize, { light: string; dark: string }> = {
+  small: { light: "/brand/miha-logo-light-small.png", dark: "/brand/miha-logo-dark-small.png" },
+  medium: { light: "/brand/miha-logo-light-medium.png", dark: "/brand/miha-logo-dark-medium.png" },
+  large: { light: "/brand/miha-logo-light-large.png", dark: "/brand/miha-logo-dark-large.png" },
 };
 
 export function BrandLogo({
