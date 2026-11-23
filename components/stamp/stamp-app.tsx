@@ -31,7 +31,7 @@ function clearSavedSession() {
   try {
     sessionStorage.removeItem(SESSION_STORAGE_KEY);
   } catch {
-    // Browser storage can be unavailable in privacy-restricted contexts.
+    // Browser storage can be unavailable in privacy-restricted contexts......
   }
 }
 
