@@ -2,9 +2,9 @@
 
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
-import { RouteEffects } from "@/components/route-effects";
-import { ScrollProgress } from "@/components/scroll-progress";
-import { SiteHeader } from "@/components/site-header";
+import { RouteEffects } from "@/components/site/route-effects";
+import { ScrollProgress } from "@/components/site/scroll-progress";
+import { SiteHeader } from "@/components/site/site-header";
 
 export function SharedSiteShell({ children, footer }: { children: ReactNode; footer: ReactNode }) {
   const pathname = usePathname();

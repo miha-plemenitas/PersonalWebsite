@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { QrGenerator } from "@/components/qr-generator";
+import { QrGenerator } from "@/components/toolbox/qr-generator";
 
 export const metadata: Metadata = {
   title: "QR Code Generator",
