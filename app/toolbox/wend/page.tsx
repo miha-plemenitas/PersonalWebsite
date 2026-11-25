@@ -10,7 +10,7 @@ export default function WendPage() {
     <section className="page-section wend-page">
       <div className="site-container">
         <Link href="/#toolbox" className="text-action wend-back-link">
-          <ArrowLeft size={15} /> Back to ToolBox
+          <ArrowLeft size={15} aria-hidden="true" /> Back to Toolbox
         </Link>
         <DailyWend />
       </div>

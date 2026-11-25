@@ -17,9 +17,11 @@ const themeSources: Record<LogoSize, { light: string; dark: string }> = {
 export function BrandLogo({
   size = "medium",
   className = "",
+  theme = "auto",
 }: {
   size?: LogoSize;
   className?: string;
+  theme?: "auto" | "light";
 }) {
   const { width, height } = dimensions[size];
 
@@ -30,20 +32,22 @@ export function BrandLogo({
         alt="Miha Plemenitas logo"
         width={width}
         height={height}
-        className="brand-logo-image brand-logo-light"
+        className={`brand-logo-image${theme === "auto" ? " brand-logo-light" : ""}`}
         unoptimized
         priority={size === "large"}
       />
-      <Image
-        src={themeSources[size].dark}
-        alt=""
-        width={width}
-        height={height}
-        className="brand-logo-image brand-logo-dark"
-        aria-hidden="true"
-        unoptimized
-        priority={size === "large"}
-      />
+      {theme === "auto" && (
+        <Image
+          src={themeSources[size].dark}
+          alt=""
+          width={width}
+          height={height}
+          className="brand-logo-image brand-logo-dark"
+          aria-hidden="true"
+          unoptimized
+          priority={size === "large"}
+        />
+      )}
     </span>
   );
 }

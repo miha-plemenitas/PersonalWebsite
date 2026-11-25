@@ -1,20 +1,20 @@
 .portfolio {
-  --white: #fff;
-  --ink: #111216;
-  --muted: #4c5167;
-  --line: #cdd2e7;
-  --accent: #1d2f80;
+  --white: var(--portfolio-white);
+  --ink: var(--portfolio-ink);
+  --muted: var(--portfolio-muted);
+  --line: var(--portfolio-line);
+  --accent: var(--portfolio-accent);
   --light-accent: #cbd4ff;
   --header-height: var(--portfolio-header-height, 72px);
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --gutter: clamp(1.25rem, 5vw, 5.5rem);
   --measure: 74rem;
   --paper: #eef0fc;
-  --hero-scene: #101631;
+  --hero-scene: var(--portfolio-navy);
   --hero-shadow: #14215b;
   --work-surface: #f7f8ff;
   --resume-surface: #f9f4ec;
-  --toolbox-surface: #f3f5ff;
+  --toolbox-surface: var(--portfolio-toolbox-surface);
   background: var(--white);
   color: var(--ink);
   font-family: "Manrope", system-ui, sans-serif;
@@ -801,9 +801,7 @@
 
 .toolbox {
   background-color: var(--toolbox-surface);
-  background-image:
-    linear-gradient(rgb(29 47 128 / 3%) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(29 47 128 / 3%) 1px, transparent 1px);
+  background-image: var(--portfolio-toolbox-grid);
   background-attachment: fixed;
   background-size: 32px 32px;
 }

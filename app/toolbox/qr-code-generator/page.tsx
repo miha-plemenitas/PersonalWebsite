@@ -13,14 +13,13 @@ export default function QrCodeGeneratorPage() {
     <section className="page-section">
       <div className="site-container">
         <Link href="/#toolbox" className="text-action">
-          <ArrowLeft size={15} /> Back to ToolBox
+          <ArrowLeft size={15} aria-hidden="true" /> Back to Toolbox
         </Link>
         <div className="mt-12">
           <div className="section-heading" data-reveal>
             <div className="section-kicker">
-              <span>01</span>
-              <span className="section-kicker-line" />
-              <span>Create</span>
+              <span className="toolbox-kicker-mark" aria-hidden="true" />
+              <span>Toolbox</span>
             </div>
             <h1 className="section-title">
               QR code

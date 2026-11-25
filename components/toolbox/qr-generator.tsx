@@ -5,13 +5,15 @@ import QRCode from "qrcode";
 import { Download, Link2, QrCode, RotateCcw } from "lucide-react";
 
 const DEFAULT_VALUE = "https://mihaplemenitas.com";
+const DEFAULT_FOREGROUND = "#111216";
+const DEFAULT_BACKGROUND = "#ffffff";
 
 export function QrGenerator() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [value, setValue] = useState(DEFAULT_VALUE);
   const [size, setSize] = useState("320");
-  const [foreground, setForeground] = useState("#1d211d");
-  const [background, setBackground] = useState("#ffffff");
+  const [foreground, setForeground] = useState(DEFAULT_FOREGROUND);
+  const [background, setBackground] = useState(DEFAULT_BACKGROUND);
 
   useEffect(() => {
     if (!canvasRef.current || !value.trim()) return;
@@ -35,13 +37,13 @@ export function QrGenerator() {
   function reset() {
     setValue("");
     setSize("320");
-    setForeground("#1d211d");
-    setBackground("#ffffff");
+    setForeground(DEFAULT_FOREGROUND);
+    setBackground(DEFAULT_BACKGROUND);
   }
 
   return (
     <div className="qr-generator grid gap-8 lg:grid-cols-[.9fr_1.1fr]">
-      <div className="rounded-3xl border border-line bg-surface p-6 shadow-card sm:p-8">
+      <div className="min-w-0 border border-line bg-surface p-6 sm:p-8">
         <label htmlFor="qr-content" className="text-sm font-semibold text-ink">
           Text or URL
         </label>
@@ -51,52 +53,52 @@ export function QrGenerator() {
           onChange={(event) => setValue(event.target.value)}
           placeholder="https://example.com"
           rows={5}
-          className="mt-3 w-full resize-none rounded-2xl border border-line bg-paper px-4 py-3 text-sm text-ink placeholder:text-muted/60 focus:border-coral focus:outline-none"
+          className="mt-3 w-full resize-none border bg-paper px-4 py-3 text-sm text-ink placeholder:text-muted"
         />
-        <div className="mt-7 grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <label className="text-sm font-semibold text-ink">
             Size
             <select
               value={size}
               onChange={(event) => setSize(event.target.value)}
-              className="mt-2 w-full rounded-xl border border-line bg-paper px-3 py-2.5 font-normal text-ink"
+              className="mt-2 min-h-11 w-full border bg-paper px-3 py-2 font-normal text-ink"
             >
               <option value="240">Small</option>
               <option value="320">Medium</option>
               <option value="480">Large</option>
             </select>
           </label>
-          <label className="text-sm font-semibold text-ink">
-            Colors
+          <fieldset className="min-w-0 text-sm font-semibold text-ink">
+            <legend>Colors</legend>
             <div className="mt-2 flex gap-2">
               <input
                 aria-label="Foreground color"
                 type="color"
                 value={foreground}
                 onChange={(event) => setForeground(event.target.value)}
-                className="h-11 w-full cursor-pointer rounded-xl border border-line bg-paper p-1"
+                className="h-11 min-w-0 flex-1 cursor-pointer border bg-paper p-1"
               />
               <input
                 aria-label="Background color"
                 type="color"
                 value={background}
                 onChange={(event) => setBackground(event.target.value)}
-                className="h-11 w-full cursor-pointer rounded-xl border border-line bg-paper p-1"
+                className="h-11 min-w-0 flex-1 cursor-pointer border bg-paper p-1"
               />
             </div>
-          </label>
+          </fieldset>
         </div>
         <div className="mt-8 flex flex-wrap gap-3">
           <button
             onClick={downloadQr}
             disabled={!value.trim()}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-ink px-5 py-3 text-sm font-semibold text-paper transition-opacity hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto"
+            className="qr-primary inline-flex min-h-11 w-full items-center justify-center gap-2 border px-3 py-2 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto"
           >
             <Download size={16} /> Download PNG
           </button>
           <button
             onClick={reset}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-line px-5 py-3 text-sm font-semibold text-ink hover:bg-paper sm:w-auto"
+            className="qr-secondary inline-flex min-h-11 w-full items-center justify-center gap-2 border px-3 py-2 text-sm font-semibold text-ink sm:w-auto"
           >
             <RotateCcw size={15} /> Reset
           </button>
@@ -105,8 +107,8 @@ export function QrGenerator() {
           <Link2 size={14} /> Your content stays in your browser.
         </p>
       </div>
-      <div className="flex min-h-[300px] items-center justify-center rounded-3xl border border-line bg-sand/60 p-4 sm:min-h-[420px] sm:p-8">
-        <div className="max-w-full rounded-2xl bg-surface p-3 shadow-lg shadow-ink/5 sm:p-5">
+      <div className="flex min-h-[300px] min-w-0 items-center justify-center border border-line bg-paper p-4 sm:min-h-[420px] sm:p-8">
+        <div className="max-w-full border border-line bg-surface p-3 sm:p-4">
           {value.trim() ? (
             <canvas
               ref={canvasRef}

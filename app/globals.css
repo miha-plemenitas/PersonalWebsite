@@ -2,6 +2,16 @@
 @import "tailwindcss";
 
 :root {
+  --portfolio-white: #fff;
+  --portfolio-ink: #111216;
+  --portfolio-muted: #4c5167;
+  --portfolio-line: #cdd2e7;
+  --portfolio-accent: #1d2f80;
+  --portfolio-navy: #101631;
+  --portfolio-toolbox-surface: #f3f5ff;
+  --portfolio-toolbox-grid:
+    linear-gradient(rgb(29 47 128 / 3%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(29 47 128 / 3%) 1px, transparent 1px);
   --paper: #f7f6f2;
   --ink: #1d211d;
   --muted: #6c716b;
@@ -1055,27 +1065,27 @@ select:focus-visible {
 }
 .wend-word-0,
 .wend-answer-0 {
-  --wend-word-color: #a61b45;
+  --wend-word-color: #30459f;
 }
 .wend-word-1,
 .wend-answer-1 {
-  --wend-word-color: #7f1535;
+  --wend-word-color: #374f76;
 }
 .wend-word-2,
 .wend-answer-2 {
-  --wend-word-color: #551025;
+  --wend-word-color: #403a76;
 }
 .wend-word-3,
 .wend-answer-3 {
-  --wend-word-color: #bd4568;
+  --wend-word-color: #325c70;
 }
 .wend-word-4,
 .wend-answer-4 {
-  --wend-word-color: #8d2a49;
+  --wend-word-color: #514881;
 }
 .wend-word-5,
 .wend-answer-5 {
-  --wend-word-color: #6c1934;
+  --wend-word-color: #242d53;
 }
 .wend-cell i {
   position: absolute;
@@ -2145,24 +2155,6 @@ footer {
   }
 }
 
-.qr-generator button,
-.qr-generator input,
-.qr-generator select,
-.qr-generator textarea {
-  border-radius: 0;
-}
-.qr-generator > div {
-  border-radius: 0;
-  box-shadow: none;
-}
-.qr-generator > div:last-child {
-  background: var(--surface);
-}
-.qr-generator > div > div {
-  border-radius: 0;
-  box-shadow: none;
-}
-
 @media (max-width: 639px) {
   .building-stage {
     background-color: var(--surface);
@@ -2339,24 +2331,11 @@ footer {
 .wend-cell:hover {
   transform: translateY(-2px);
 }
-.wend-controls button:hover,
-.qr-generator button:not(:disabled):hover {
+.wend-controls button:hover {
   border-color: var(--coral);
 }
 .wend-panel button:hover {
   color: var(--coral);
-}
-.qr-generator input,
-.qr-generator textarea,
-.qr-generator select {
-  transition:
-    border-color 180ms ease,
-    box-shadow 180ms ease;
-}
-.qr-generator input:focus,
-.qr-generator textarea:focus,
-.qr-generator select:focus {
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--coral) 12%, transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {

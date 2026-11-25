@@ -1,0 +1,126 @@
+body:has(> .toolbox-site-main) {
+  --paper: var(--portfolio-toolbox-surface);
+  --ink: var(--portfolio-ink);
+  --muted: var(--portfolio-muted);
+  --line: var(--portfolio-line);
+  --surface: var(--portfolio-white);
+  /* Map the legacy tool styles to the same blue accent as the portfolio. */
+  --coral: var(--portfolio-accent);
+  --toolbox-hover: #edf0fa;
+  --toolbox-control-line: #818aab;
+  background-color: var(--paper);
+  background-image: var(--portfolio-toolbox-grid);
+  background-attachment: fixed;
+  background-size: 32px 32px;
+  color-scheme: light;
+}
+
+body:has(> .toolbox-site-main)::before {
+  display: none;
+}
+
+body:has(> .toolbox-site-main) > footer {
+  background: var(--surface);
+}
+
+.toolbox-site-main :is(a, button, input, select, textarea):focus-visible,
+.toolbox-site-main .qr-generator :is(input, select, textarea):focus,
+body:has(> .toolbox-site-main) > footer a:focus-visible {
+  outline: 2px solid var(--portfolio-accent);
+  outline-offset: 3px;
+}
+
+.toolbox-site-main .site-container {
+  width: min(100% - 2 * clamp(1.25rem, 5vw, 5.5rem), 74rem);
+}
+
+.toolbox-site-main .page-section {
+  padding-block: clamp(2rem, 5vw, 4rem);
+}
+
+.toolbox-site-main .text-action {
+  min-height: 44px;
+  color: var(--portfolio-accent);
+}
+
+.toolbox-site-main .section-kicker,
+.toolbox-site-main .wend-kicker {
+  color: var(--portfolio-accent);
+}
+
+.toolbox-kicker-mark,
+.wend-kicker::before {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: currentColor;
+}
+
+.toolbox-site-main .wend-kicker::before {
+  margin-inline-end: 8px;
+  content: "";
+}
+
+.toolbox-site-main .wend-status-dot:not(.is-complete),
+.toolbox-site-main .wend-obstacle {
+  background: var(--toolbox-control-line);
+}
+
+.toolbox-site-main .wend-cell {
+  font-weight: 700;
+}
+
+.toolbox-site-main .wend-cell:hover {
+  transform: none;
+}
+
+.toolbox-site-main .wend-cell:focus-visible {
+  z-index: 2;
+  outline-offset: -3px;
+}
+
+.toolbox-site-main .wend-cell:is(.is-selected, .is-used):focus-visible {
+  outline-color: var(--surface);
+}
+
+.toolbox-site-main .wend-cell i {
+  color: var(--surface);
+}
+
+.toolbox-site-main .wend-controls button {
+  min-height: 44px;
+  border-color: var(--toolbox-control-line);
+}
+
+.toolbox-site-main .wend-controls button:hover:not(:disabled):not(:nth-child(2)),
+.toolbox-site-main .wend-panel button:hover {
+  border-color: var(--portfolio-accent);
+  background: var(--toolbox-hover);
+  color: var(--portfolio-accent);
+}
+
+.toolbox-site-main .wend-controls button:nth-child(2),
+.toolbox-site-main .wend-controls button:nth-child(2):hover:not(:disabled) {
+  border-color: var(--portfolio-accent);
+}
+
+.qr-generator :is(input, select, textarea, .qr-secondary) {
+  border-color: var(--toolbox-control-line);
+}
+
+.qr-generator .qr-primary {
+  border-color: var(--portfolio-accent);
+  background: var(--portfolio-accent);
+  color: var(--portfolio-white);
+}
+
+.qr-generator .qr-primary:hover:not(:disabled) {
+  border-color: var(--portfolio-navy);
+  background: var(--portfolio-navy);
+}
+
+.qr-generator .qr-secondary:hover {
+  border-color: var(--portfolio-accent);
+  background: var(--toolbox-hover);
+  color: var(--portfolio-accent);
+}

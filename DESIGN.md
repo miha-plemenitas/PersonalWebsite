@@ -28,3 +28,7 @@ The portfolio is a single scrolling page at `/`. Its visual system uses white su
 - Keep controls at least 44px high. Escape closes the mobile disclosure and returns focus to its summary. Link activation closes it and lets the browser navigate to the section.
 
 The header is implemented in `components/portfolio/portfolio-header.tsx` and `components/portfolio/portfolio-header.module.css`. Stamp is a separate app at `/stamp` with its own interface.
+
+## Toolbox pages
+
+Public tool routes reuse the homepage Toolbox palette and 32px grid, with white panels, square controls, and deep blue focus and action states. They use the portfolio's light theme regardless of system appearance. The QR artwork itself stays customizable. The Toolbox styles do not apply to Stamp.

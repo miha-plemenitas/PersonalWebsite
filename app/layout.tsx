@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SharedSiteShell } from "@/components/site/shared-site-shell";
 import "./globals.css";
+import "../components/toolbox/toolbox-theme.css";
 import "../components/stamp/stamp.css";
 
 export const metadata: Metadata = {
@@ -24,7 +25,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body>
-        <SharedSiteShell footer={<SiteFooter />}>{children}</SharedSiteShell>
+        <SharedSiteShell footer={<SiteFooter />} toolboxFooter={<SiteFooter fixedTheme />}>
+          {children}
+        </SharedSiteShell>
       </body>
     </html>
   );
