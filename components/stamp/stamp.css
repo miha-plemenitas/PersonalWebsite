@@ -4,7 +4,7 @@ body:has(.stamp-app) {
   color: #20211f;
 }
 body:has(.stamp-app)::before,
-body:has(.stamp-app) .site-header,
+body:has(.stamp-app) > header,
 body:has(.stamp-app) .scroll-progress,
 body:has(.stamp-app) > footer {
   display: none;

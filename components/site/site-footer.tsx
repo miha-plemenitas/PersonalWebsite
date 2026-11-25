@@ -1,4 +1,5 @@
 import { BrandLogo } from "@/components/brand-logo";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function SiteFooter() {
   return (
@@ -8,7 +9,7 @@ export function SiteFooter() {
           <BrandLogo size="medium" />
           <span>© {new Date().getFullYear()} Miha Plemenitaš</span>
         </div>
-        <div className="flex items-center gap-5">
+        <div className="flex flex-wrap items-center gap-5">
           <a className="footer-link" href="mailto:miha.plemenitas@gmail.com">
             Email
           </a>
@@ -23,6 +24,7 @@ export function SiteFooter() {
           <span className="font-mono text-[10px] uppercase tracking-[.16em]">
             Murska Sobota, SI
           </span>
+          <ThemeToggle />
         </div>
       </div>
     </footer>

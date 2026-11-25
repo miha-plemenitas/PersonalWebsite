@@ -1,55 +1,42 @@
 div:has(> .header) {
-  --portfolio-header-height: 76px;
-  --portfolio-rail-height: 76px;
-}
-
-div:has(> .header[data-compact]) {
   --portfolio-header-height: 72px;
-  --portfolio-rail-height: 60px;
 }
 
 .header {
-  --rail-height: var(--portfolio-rail-height, 76px);
+  --rail-height: 60px;
+  --rail-inset: 12px;
   --rail-ink: #111216;
   --rail-blue: #1d2f80;
   --rail-white: #fff;
   --rail-hover: #edf0fa;
   --rail-rule: #d5daeb;
-  --nav-transition: 140ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1));
+  --nav-transition: 200ms cubic-bezier(0.22, 1, 0.36, 1);
   box-sizing: border-box;
-  position: sticky;
-  top: 0;
+  position: fixed;
+  inset: 0 0 auto;
   z-index: 10;
+  padding-top: var(--rail-inset);
   color: var(--rail-ink);
-  background: var(--rail-white);
-  border-bottom: 1px solid var(--rail-rule);
-}
-
-.header[data-compact] {
-  min-height: var(--portfolio-header-height);
-  background: transparent;
-  border-bottom-color: transparent;
+  pointer-events: none;
 }
 
 .inner {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
   box-sizing: border-box;
-  width: min(100% - 2 * var(--gutter, 1.25rem), var(--measure, 74rem));
-  min-height: calc(var(--rail-height) - 1px);
+  width: calc(
+    min(100% - 2 * var(--gutter, clamp(1.25rem, 5vw, 5.5rem)), var(--measure, 74rem)) * 0.96
+  );
+  min-height: var(--rail-height);
   margin-inline: auto;
   padding-inline-start: clamp(1.5rem, 2.5vw, 2rem);
-  border: 1px solid transparent;
-}
-
-.header[data-compact] .inner {
+  border: 1px solid var(--rail-rule);
   background: var(--rail-white);
-  border-color: var(--rail-rule);
   box-shadow: 0 8px 22px rgb(16 22 49 / 12%);
-  transform-origin: center top;
-  transform: translateY(12px) scaleX(0.96);
+  pointer-events: auto;
 }
 
 .brand {
@@ -58,8 +45,8 @@ div:has(> .header[data-compact]) {
   gap: 0.625rem;
   min-height: 44px;
   font-size: 0.875rem;
-  font-weight: 800;
-  line-height: 1.2;
+  font-weight: 700;
+  line-height: 1.25rem;
 }
 
 .brand img {
@@ -153,16 +140,11 @@ div:has(> .header[data-compact]) {
 @media (width < 48rem) {
   div:has(> .header) {
     --portfolio-header-height: 60px;
-    --portfolio-rail-height: 60px;
   }
 
-  div:has(> .header[data-compact]) {
-    --portfolio-header-height: 60px;
-    --portfolio-rail-height: 52px;
-  }
-
-  .header[data-compact] .inner {
-    transform: translateY(8px) scaleX(0.97);
+  .header {
+    --rail-height: 52px;
+    --rail-inset: 8px;
   }
 
   .desktopNav {
@@ -171,6 +153,7 @@ div:has(> .header[data-compact]) {
 
   .inner {
     gap: 0.5rem;
+    width: calc(min(100% - 2 * var(--gutter, 1.25rem), var(--measure, 74rem)) * 0.97);
     padding-inline: 0.75rem 0.5rem;
   }
 
@@ -195,7 +178,7 @@ div:has(> .header[data-compact]) {
   .mobileNav {
     position: absolute;
     inset: 100% 0 auto;
-    max-height: calc(100dvh - var(--rail-height));
+    max-height: calc(100dvh - var(--rail-height) - var(--rail-inset));
     overflow-y: auto;
     border-block: 1px solid var(--rail-rule);
     background: var(--rail-white);
@@ -214,29 +197,13 @@ div:has(> .header[data-compact]) {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .inner {
-    transition:
-      min-height var(--nav-transition),
-      transform var(--nav-transition),
-      background-color var(--nav-transition),
-      border-color var(--nav-transition),
-      box-shadow var(--nav-transition);
-  }
-
-  .header {
-    transition:
-      min-height var(--nav-transition),
-      background-color var(--nav-transition),
-      border-color var(--nav-transition);
-  }
-
   .brand,
   .link,
   .menuToggle {
     transition:
-      background-color 150ms ease,
-      color 150ms ease,
-      transform 120ms var(--ease-out);
+      background-color var(--nav-transition),
+      color var(--nav-transition),
+      transform var(--nav-transition);
   }
 
   .link:active,
@@ -247,8 +214,8 @@ div:has(> .header[data-compact]) {
   .link::after {
     transform: translateY(2px);
     transition:
-      opacity 160ms ease,
-      transform 160ms var(--ease-out);
+      opacity var(--nav-transition),
+      transform var(--nav-transition);
   }
 
   .link[aria-current="location"]::after {
@@ -256,7 +223,7 @@ div:has(> .header[data-compact]) {
   }
 
   .mobileMenu[open] .mobileNav {
-    animation: menu-in 160ms var(--ease-out) both;
+    animation: menu-in var(--nav-transition) both;
   }
 }
 

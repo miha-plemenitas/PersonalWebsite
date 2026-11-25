@@ -5,7 +5,7 @@
   --line: #cdd2e7;
   --accent: #1d2f80;
   --light-accent: #cbd4ff;
-  --header-height: var(--portfolio-header-height, 76px);
+  --header-height: var(--portfolio-header-height, 72px);
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --gutter: clamp(1.25rem, 5vw, 5.5rem);
   --measure: 74rem;
@@ -54,6 +54,7 @@
   position: relative;
   isolation: isolate;
   overflow: clip;
+  padding-top: var(--header-height);
   background: var(--hero-shadow);
   color: var(--white);
 }

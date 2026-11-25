@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { RouteEffects } from "@/components/site/route-effects";
 import { ScrollProgress } from "@/components/site/scroll-progress";
-import { SiteHeader } from "@/components/site/site-header";
+import { PortfolioHeader } from "@/components/portfolio/portfolio-header";
 
 export function SharedSiteShell({ children, footer }: { children: ReactNode; footer: ReactNode }) {
   const pathname = usePathname();
@@ -14,7 +14,7 @@ export function SharedSiteShell({ children, footer }: { children: ReactNode; foo
   return (
     <>
       <ScrollProgress />
-      <SiteHeader />
+      <PortfolioHeader />
       <RouteEffects />
       <main className="shared-site-main min-h-[calc(100vh-13rem)]">{children}</main>
       {footer}

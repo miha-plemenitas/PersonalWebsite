@@ -21,15 +21,17 @@ const links = [
 
 function NavigationLinks({
   current,
+  home,
   onNavigate,
 }: {
   current: string;
+  home: boolean;
   onNavigate?: (event: MouseEvent<HTMLAnchorElement>) => void;
 }) {
   return links.map(([label, id]) => (
     <NavigationMenuItem key={id}>
       <NavigationMenuLink
-        href={`#${id}`}
+        href={`${home ? "" : "/"}#${id}`}
         aria-current={current === id ? "location" : undefined}
         className={styles.link}
         onClick={onNavigate}
@@ -40,13 +42,14 @@ function NavigationLinks({
   ));
 }
 
-export function PortfolioHeader() {
+export function PortfolioHeader({ home = false }: { home?: boolean }) {
   const menu = useRef<HTMLDetailsElement>(null);
   const header = useRef<HTMLElement>(null);
   const [current, setCurrent] = useState("");
-  const [compact, setCompact] = useState(false);
 
   useEffect(() => {
+    if (!home) return;
+
     const sections = links.flatMap(([, id]) => {
       const section = document.getElementById(id);
       return section ? [section] : [];
@@ -55,8 +58,7 @@ export function PortfolioHeader() {
 
     function updateSection() {
       frame = 0;
-      setCompact(window.scrollY > 48);
-      // Use the reading area below the sticky header as the activation point.
+      // Use the reading area below the fixed header as the activation point.
       const readingLine = Math.max(
         (header.current?.offsetHeight ?? 0) + 16,
         Math.min(200, window.innerHeight * 0.25),
@@ -84,7 +86,7 @@ export function PortfolioHeader() {
       window.removeEventListener("resize", scheduleSectionUpdate);
       window.removeEventListener("hashchange", scheduleSectionUpdate);
     };
-  }, []);
+  }, [home]);
 
   useEffect(() => {
     const desktop = window.matchMedia("(min-width: 48rem)");
@@ -114,7 +116,6 @@ export function PortfolioHeader() {
     <header
       ref={header}
       className={styles.header}
-      data-compact={compact || undefined}
       onBlur={(event) => {
         if (
           event.relatedTarget &&
@@ -133,13 +134,13 @@ export function PortfolioHeader() {
       }}
     >
       <div className={styles.inner}>
-        <a href="#top" className={styles.brand}>
+        <a href={home ? "#top" : "/"} className={styles.brand}>
           <Image src="/portfolio/brand-mark.png" alt="" width={33} height={22} unoptimized />
           <span>Miha Plemenitaš</span>
         </a>
         <NavigationMenu className={styles.desktopNav} aria-label="Portfolio">
           <NavigationMenuList className={styles.navList}>
-            <NavigationLinks current={current} />
+            <NavigationLinks current={current} home={home} />
           </NavigationMenuList>
         </NavigationMenu>
         <details className={styles.mobileMenu} ref={menu}>
@@ -155,6 +156,7 @@ export function PortfolioHeader() {
             <NavigationMenuList className={styles.navList}>
               <NavigationLinks
                 current={current}
+                home={home}
                 onNavigate={(event) => {
                   if (
                     event.defaultPrevented ||

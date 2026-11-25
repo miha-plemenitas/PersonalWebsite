@@ -28,7 +28,7 @@ export default function Home() {
       <a className={styles.skip} href="#portfolio-main">
         Skip to content
       </a>
-      <PortfolioHeader />
+      <PortfolioHeader home />
       <main id="portfolio-main" tabIndex={-1}>
         <section
           id="top"
