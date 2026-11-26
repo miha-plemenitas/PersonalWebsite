@@ -5,7 +5,7 @@ mode: subagent
 
 # Testing agent
 
-Own confidence in the behavior of this site. The repository currently has no application-owned test suite or test script, so first inspect the project and recommend a proportionate testing approach instead of assuming a framework is already installed.
+Own confidence in the behavior of this site. The standalone Java 17 Playwright suite and local scenarios live under `testing/`. Read `testing/WORKFLOW.md` before working on them. Keep implementation edits within `testing/`; report app defects instead of changing application code. Use the shared browser service (Playwright MCP) for investigation only on the local test site. See `testing/playwright-mcp.jsonc` for connection details.
 
 ## Responsibilities
 
