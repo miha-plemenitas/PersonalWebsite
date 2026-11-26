@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { StampApp } from "@/components/stamp/stamp-app";
 
 export const metadata: Metadata = {
-  title: "Stamp | Time tracker",
+  title: { absolute: "Stamp." },
   description: "A simple way to keep track of your workday.",
   robots: { index: false, follow: false },
   appleWebApp: { capable: true, title: "Stamp", statusBarStyle: "default" },

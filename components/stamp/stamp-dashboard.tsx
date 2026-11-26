@@ -4,17 +4,22 @@ import Image from "next/image";
 import { StampPwa } from "@/components/stamp/stamp-pwa";
 import {
   clockDisplay,
-  dateKey,
+  DEFAULT_HOURLY_RATE_CENTS,
   duration,
   fmt,
+  formatEarnings,
   formatSheetTime,
+  hourlyRateDraft,
   hours,
   keyOf,
-  minutes,
+  monthlyHours,
   monthName,
+  parseHourlyRate,
+  recentMonthHours,
   storedGoal,
   timeInput,
 } from "@/components/stamp/stamp-dashboard-utils";
+import { rowDateKey as dateKey, timeMinutes as minutes } from "@/components/stamp/stamp-sheet-utils";
 import {
   ArrowUpRight,
   CalendarDays,
@@ -23,6 +28,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock3,
+  Euro,
   Home,
   LoaderCircle,
   LogOut,
@@ -77,6 +83,49 @@ const views: { id: View; label: string; Icon: typeof Home }[] = [
 ];
 const prefsKey = "stamp-dashboard-preferences-v1";
 
+type ChartBar = {
+  key: string;
+  label: string;
+  accessibleLabel: string;
+  amount: number;
+  display: string;
+  current?: boolean;
+};
+
+function StampBarChart({
+  title,
+  description,
+  bars,
+  variant,
+}: {
+  title: string;
+  description: string;
+  bars: ChartBar[];
+  variant: "hours" | "earnings";
+}) {
+  const max = Math.max(1, ...bars.map(({ amount }) => amount));
+  return (
+    <figure className="stamp-chart-card" data-chart={variant}>
+      <figcaption>
+        <h2>{title}</h2>
+        <p>{description}</p>
+      </figcaption>
+      <ul className="stamp-chart-bars" role="list">
+        {bars.map((bar) => (
+          <li key={bar.key} className="stamp-chart-bar" data-current={bar.current || undefined}>
+            <span className="sr-only">{bar.accessibleLabel}: </span>
+            <strong>{bar.display}</strong>
+            <div className="stamp-chart-track" aria-hidden="true">
+              <i style={{ height: `${Math.max(0, (bar.amount / max) * 100)}%` }} />
+            </div>
+            <span aria-hidden="true">{bar.label}</span>
+          </li>
+        ))}
+      </ul>
+    </figure>
+  );
+}
+
 export function StampDashboard(p: Props) {
   const [view, setView] = useState<View>("overview");
   const [offset, setOffset] = useState(0);
@@ -94,12 +143,16 @@ export function StampDashboard(p: Props) {
   const [dailyGoal, setDailyGoal] = useState(8);
   const [weeklyGoal, setWeeklyGoal] = useState(40);
   const [monthlyGoal, setMonthlyGoal] = useState(80);
+  const [rateCents, setRateCents] = useState(DEFAULT_HOURLY_RATE_CENTS);
+  const [rateDraft, setRateDraft] = useState(hourlyRateDraft(DEFAULT_HOURLY_RATE_CENTS));
+  const [rateError, setRateError] = useState(false);
   const [goalDrafts, setGoalDrafts] = useState<Record<GoalKey, string>>({
     dailyGoal: "8",
     weeklyGoal: "40",
     monthlyGoal: "80",
   });
   const [loaded, setLoaded] = useState(false);
+  const emailAt = p.accountEmail.lastIndexOf("@");
   useEffect(() => {
     const modal = entryDialog.current;
     if (dialog && modal && !modal.open) modal.showModal();
@@ -116,6 +169,10 @@ export function StampDashboard(p: Props) {
       setDailyGoal(daily);
       setWeeklyGoal(weekly);
       setMonthlyGoal(monthly);
+      if (Number.isSafeInteger(v.rateCents) && v.rateCents >= 0) {
+        setRateCents(v.rateCents);
+        setRateDraft(hourlyRateDraft(v.rateCents));
+      }
       setGoalDrafts({
         dailyGoal: String(daily),
         weeklyGoal: String(weekly),
@@ -131,12 +188,12 @@ export function StampDashboard(p: Props) {
       try {
         localStorage.setItem(
           prefsKey,
-          JSON.stringify({ theme, dailyGoal, weeklyGoal, monthlyGoal }),
+          JSON.stringify({ theme, dailyGoal, weeklyGoal, monthlyGoal, rateCents }),
         );
       } catch {
         /* settings remain active for this visit */
       }
-  }, [dailyGoal, loaded, monthlyGoal, theme, weeklyGoal]);
+  }, [dailyGoal, loaded, monthlyGoal, rateCents, theme, weeklyGoal]);
 
   const todayKey = keyOf(p.now),
     month = useMemo(
@@ -157,16 +214,16 @@ export function StampDashboard(p: Props) {
     ),
   );
   const todayRow = rows.find((x) => x.key === todayKey)?.row;
-  const monthTotal =
-    monthRows.reduce((sum, x) => sum + hours(x.row), 0) +
-    (month.getFullYear() === p.now.getFullYear() &&
-    month.getMonth() === p.now.getMonth() &&
-    p.isWorking
-      ? p.liveTodayHours
-      : 0);
+  const arrival = formatSheetTime(todayRow?.[2]);
+  const departure = formatSheetTime(todayRow?.[3]);
+  const monthTotal = monthlyHours(
+    monthRows,
+    todayKey,
+    offset === 0 && p.isWorking ? p.liveTodayHours : null,
+  );
   const weekStart = new Date(p.now.getFullYear(), p.now.getMonth(), p.now.getDate());
   weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
-  const weekDays = Array.from({ length: 5 }, (_, i) => {
+  const fullWeek = Array.from({ length: 7 }, (_, i) => {
     const date = new Date(weekStart);
     date.setDate(date.getDate() + i);
     const key = keyOf(date),
@@ -174,9 +231,10 @@ export function StampDashboard(p: Props) {
     return {
       date,
       key,
-      hours: key === todayKey && p.isWorking ? p.liveTodayHours : r ? hours(r.row) : 0,
+      hours: key > todayKey ? 0 : key === todayKey && p.isWorking ? p.liveTodayHours : hours(r?.row),
     };
   });
+  const weekDays = fullWeek.slice(0, 5);
   const weekTotal = weekDays.reduce((n, d) => n + d.hours, 0);
   const percent = Math.min(100, Math.round((p.liveTodayHours / dailyGoal) * 100));
   const monthPercent = monthlyGoal
@@ -226,6 +284,13 @@ export function StampDashboard(p: Props) {
   }
   function changeMonth(n: number) {
     setOffset((x) => x + n);
+  }
+  function saveHourlyRate(value: string) {
+    const next = parseHourlyRate(value);
+    setRateError(next === null);
+    if (next === null) return;
+    setRateCents(next);
+    setRateDraft(hourlyRateDraft(next));
   }
   function renderNav({ mobile = false }: { mobile?: boolean } = {}) {
     return (
@@ -290,6 +355,24 @@ export function StampDashboard(p: Props) {
         ) : (
           <>
             <div className="stamp-clock-display">{clockDisplay(p.workedSeconds)}</div>
+            <dl className="stamp-shift-times">
+              <div>
+                <dt>Arrived</dt>
+                <dd>{arrival === "—" ? arrival : <time dateTime={arrival}>{arrival}</time>}</dd>
+              </div>
+              <div>
+                <dt>Left</dt>
+                <dd>
+                  {departure !== "—" ? (
+                    <time dateTime={departure}>{departure}</time>
+                  ) : p.isWorking ? (
+                    "Still working"
+                  ) : (
+                    departure
+                  )}
+                </dd>
+              </div>
+            </dl>
             <div className="stamp-goal-summary">
               <span>
                 {p.completedToday
@@ -422,13 +505,16 @@ export function StampDashboard(p: Props) {
       </section>
     );
   }
-  function renderMetrics() {
+  function renderMetrics(staticCards = false) {
     const extra = Math.max(0, monthTotal - monthlyGoal);
+    const Card = staticCards ? "div" : "button";
+    const link = staticCards ? undefined : () => setView("timecard");
+    const arrow = !staticCards && <ArrowUpRight size={19} aria-hidden="true" />;
     return (
       <div className="stamp-insight-cards">
-        <button className="stamp-insight-card tone-carmine" onClick={() => setView("timecard")}>
+        <Card className="stamp-insight-card tone-carmine" onClick={link}>
           <span>
-            <CalendarDays size={19} /> This month <ArrowUpRight size={19} />
+            <CalendarDays size={19} /> {offset === 0 ? "This month" : monthName(month)} {arrow}
           </span>
           <strong>{duration(monthTotal)}</strong>
           <small>
@@ -437,19 +523,19 @@ export function StampDashboard(p: Props) {
           <span className="stamp-metric-progress" aria-hidden="true">
             <i style={{ transform: `scaleX(${monthPercent / 100})` }} />
           </span>
-        </button>
-        <button className="stamp-insight-card tone-marigold" onClick={() => setView("insights")}>
+        </Card>
+        <Card className="stamp-insight-card tone-marigold" onClick={link}>
           <span>
-            <ChartNoAxesColumnIncreasing size={19} /> Extra hours <ArrowUpRight size={19} />
+            <ChartNoAxesColumnIncreasing size={19} /> Extra hours {arrow}
           </span>
           <strong>+{duration(extra)}</strong>
           <small>
             {extra ? "Above your " + monthlyGoal + "h monthly goal" : "No hours above target yet"}
           </small>
-        </button>
-        <button className="stamp-insight-card tone-buckthorn" onClick={() => setView("insights")}>
+        </Card>
+        <Card className="stamp-insight-card tone-buckthorn" onClick={link}>
           <span>
-            <Clock3 size={19} /> Goal completion <ArrowUpRight size={19} />
+            <Clock3 size={19} /> Goal completion {arrow}
           </span>
           <strong>{monthPercent}%</strong>
           <small>
@@ -457,8 +543,26 @@ export function StampDashboard(p: Props) {
               ? "Monthly goal reached"
               : duration(monthlyGoal - monthTotal) + " to monthly goal"}
           </small>
-        </button>
+        </Card>
       </div>
+    );
+  }
+  function renderEarnings() {
+    return (
+      <section className="stamp-earnings-card" aria-labelledby="stamp-earnings-title">
+        <div>
+          <div className="stamp-card-title">
+            <Euro size={19} aria-hidden="true" />
+            <h2 id="stamp-earnings-title">
+              {offset === 0 ? "Earnings this month" : `Earnings for ${monthName(month)}`}
+            </h2>
+          </div>
+          <p>
+            Estimate · {duration(monthTotal)} at {formatEarnings(1, rateCents)}/hour
+          </p>
+        </div>
+        <strong>{formatEarnings(monthTotal, rateCents)}</strong>
+      </section>
     );
   }
   function renderActivity() {
@@ -553,6 +657,7 @@ export function StampDashboard(p: Props) {
             <Plus size={18} /> Add entry
           </button>
         </div>
+        {renderMetrics(true)}
         <section className="stamp-recent-card stamp-timecard-table">
           <div className="stamp-table-head">
             <span>DATE</span>
@@ -584,33 +689,39 @@ export function StampDashboard(p: Props) {
           )}
         </section>
         <p className="stamp-view-footnote">Select an entry to edit its date, time, and note.</p>
+        {renderTimecardBreakdown()}
       </section>
     );
   }
-  function renderInsights() {
-    const max = monthRows.reduce((peak, { row }) => Math.max(peak, hours(row)), dailyGoal);
-    const avg = monthRows.length ? monthTotal / monthRows.length : 0;
+  function renderTimecardBreakdown() {
+    const recordedRows = monthRows
+      .filter(({ key }) => key && key <= todayKey)
+      .map(({ key, row }) => ({
+        key,
+        total: key === todayKey && p.isWorking ? p.liveTodayHours : hours(row),
+      }));
+    const max = recordedRows.reduce((peak, { total }) => Math.max(peak, total), dailyGoal);
+    const avg = recordedRows.length ? monthTotal / recordedRows.length : 0;
     return (
-      <section className="stamp-page-view">
-        {heading("Insights")}
-        {renderMetrics()}
-        <section className="stamp-recent-card stamp-insights-chart">
+      <>
+        <section className="stamp-recent-card stamp-timecard-breakdown">
           <div className="stamp-section-head">
             <h2>Daily hours</h2>
-            <span>{monthRows.length} recorded days</span>
+            <span>{recordedRows.length} recorded days</span>
           </div>
-          {monthRows
-            .slice()
-            .reverse()
-            .map(({ row, key }) => (
+          {recordedRows.length ? (
+            recordedRows.reverse().map(({ total, key }) => (
               <div className="stamp-month-bar-row" key={key}>
                 <span>{key}</span>
                 <div>
-                  <i style={{ width: Math.min(100, (hours(row) / max) * 100) + "%" }} />
+                  <i style={{ width: Math.min(100, (total / max) * 100) + "%" }} />
                 </div>
-                <strong>{duration(hours(row))}</strong>
+                <strong>{duration(total)}</strong>
               </div>
-            ))}
+            ))
+          ) : (
+            <p className="stamp-empty-state">No recorded hours for {monthName(month)}.</p>
+          )}
         </section>
         <div className="stamp-summary-cards">
           <div>
@@ -626,6 +737,44 @@ export function StampDashboard(p: Props) {
             <strong>{monthPercent}%</strong>
           </div>
         </div>
+      </>
+    );
+  }
+  function renderInsights() {
+    const months = recentMonthHours(rows, p.now, p.isWorking ? p.liveTodayHours : null);
+    const currentMonth = todayKey.slice(0, 7);
+    return (
+      <section className="stamp-page-view">
+        {heading("Insights")}
+        <StampBarChart
+          title="Hours by day"
+          description={`This week · ${fmt(weekStart, { day: "numeric", month: "short" })} – ${fmt(fullWeek[6].date, { day: "numeric", month: "short" })}`}
+          variant="hours"
+          bars={fullWeek.map(({ date, key, hours }) => ({
+            key,
+            label: fmt(date, { weekday: "short" }),
+            accessibleLabel: fmt(date, { weekday: "long", day: "numeric", month: "long" }),
+            amount: hours,
+            display: key > todayKey ? "—" : duration(hours),
+            current: key === todayKey,
+          }))}
+        />
+        <StampBarChart
+          title="Monthly earnings"
+          description={`Current month and up to four previous months · Estimated at ${formatEarnings(1, rateCents)}/hour`}
+          variant="earnings"
+          bars={months.map(({ date, key, hours }) => ({
+            key,
+            label: fmt(date, {
+              month: "short",
+              year: date.getFullYear() !== p.now.getFullYear() ? "2-digit" : undefined,
+            }),
+            accessibleLabel: monthName(date),
+            amount: hours * rateCents,
+            display: formatEarnings(hours, rateCents),
+            current: key === currentMonth,
+          }))}
+        />
       </section>
     );
   }
@@ -693,6 +842,40 @@ export function StampDashboard(p: Props) {
           {setting("weeklyGoal", "Weekly goal", weeklyGoal, setWeeklyGoal, 168)}
           {setting("monthlyGoal", "Monthly goal", monthlyGoal, setMonthlyGoal, 744)}
         </section>
+        <section className="stamp-settings-card" aria-labelledby="stamp-earnings-settings">
+          <div className="stamp-settings-title">
+            <div>
+              <h2 id="stamp-earnings-settings">Earnings</h2>
+              <p>Used for your monthly estimate and saved on this device.</p>
+            </div>
+          </div>
+          <label className="stamp-setting-row">
+            Hourly rate
+            <span>
+              <input
+                type="text"
+                inputMode="decimal"
+                value={rateDraft}
+                aria-invalid={rateError || undefined}
+                aria-describedby={rateError ? "stamp-rate-error" : undefined}
+                onChange={(event) => {
+                  setRateDraft(event.currentTarget.value);
+                  setRateError(false);
+                }}
+                onBlur={(event) => saveHourlyRate(event.currentTarget.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") event.currentTarget.blur();
+                }}
+              />
+              €/hour
+            </span>
+          </label>
+          {rateError && (
+            <p id="stamp-rate-error" className="stamp-entry-error" role="alert">
+              Enter a nonnegative rate with up to two decimal places, for example 7,73.
+            </p>
+          )}
+        </section>
         <section className="stamp-settings-card stamp-account-card">
           <div>
             <h2>Google Sheets</h2>
@@ -734,7 +917,6 @@ export function StampDashboard(p: Props) {
             stamp
             <span className="stamp-wordmark-dot" aria-hidden="true" />
           </strong>
-          <small>YOUR WORK TIMECARD</small>
         </a>
         {renderNav()}
         <div className="stamp-sidebar-bottom">
@@ -746,7 +928,17 @@ export function StampDashboard(p: Props) {
             </small>
           </div>
           <div className="stamp-user">
-            <strong>{p.accountEmail || "Stamp user"}</strong>
+            <strong>
+              {emailAt > 0 ? (
+                <>
+                  {p.accountEmail.slice(0, emailAt)}
+                  <wbr />
+                  {p.accountEmail.slice(emailAt)}
+                </>
+              ) : (
+                p.accountEmail || "Stamp user"
+              )}
+            </strong>
             <span>Personal workspace</span>
           </div>
         </div>
@@ -833,16 +1025,13 @@ export function StampDashboard(p: Props) {
                 {renderWeeklyCard()}
               </div>
               {renderMetrics()}
+              {renderEarnings()}
               {renderActivity()}
             </section>
           )}
           {view === "timecard" && renderTimecard()}
           {view === "insights" && renderInsights()}
           {view === "settings" && renderSettings()}
-          <footer className="stamp-dashboard-footer">
-            <span>Stamp · A little clarity for your working day.</span>
-            <span>Google Sheets connected</span>
-          </footer>
           {(p.notice || p.error) && (
             <div
               role={p.error ? "alert" : "status"}
